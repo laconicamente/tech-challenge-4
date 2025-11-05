@@ -1,0 +1,131 @@
+import { cardMask, currencyMask, cvvMask, dateMask, expiryMask, InputMask } from "@/shared/helpers/formatInputMask";
+import React, { useId } from "react";
+import { KeyboardTypeOptions, StyleSheet, Text, View } from "react-native";
+import MaskInput from 'react-native-mask-input';
+import { TextInput, TextInputProps, useTheme } from "react-native-paper";
+
+export type BytebankInputProps = {
+    label: string;
+    value?: string;
+    type?: string;
+    placeholder?: string;
+    error?: boolean;
+    helperText?: string;
+    autoComplete?: string;
+    color?:
+    | "primary"
+    | "secondary"
+    | "tertiary"
+    | "error"
+    | "warning"
+    variant?: "contained" | "text" | "outlined";
+    maskType?: InputMask;
+    onChangeText?: (masked: string, unmasked: string) => void;
+} & TextInputProps;
+
+
+export function BytebankInput({
+    value,
+    label,
+    type = "text",
+    placeholder,
+    error = false,
+    helperText = "",
+    autoComplete,
+    maskType,
+    color,
+    onChangeText,
+    ...props
+}: BytebankInputProps & TextInputProps) {
+    const theme = useTheme();
+    const reactId = useId();
+    const inputId = `input-${reactId}`;
+    const helperId = helperText ? `${inputId}-helper` : undefined;
+
+    const baseInputStyle = { ...styles.input, backgroundColor: '#f0f0f0', borderRadius: 10, marginBottom: 20 };
+    const maskInputStyle = { ...baseInputStyle, height: 50, fontSize: 16, paddingHorizontal: 15 };
+    
+    const HelperText = () => (helperText ? (
+        <Text
+          style={{
+            color: error ? '#d32f2f' : '#888',
+            fontSize: 12,
+            marginLeft: 10,
+            marginTop: -15,
+            marginBottom: 10,
+          }}
+          nativeID={helperId}
+        >
+          {helperText}
+        </Text>
+    ) : null);
+
+    if (maskType) {
+        let mask: any[] | ((value?: string) => any[]);
+        switch (maskType) {
+            case 'currency': mask = currencyMask; break;
+            case 'date': mask = dateMask; break;
+            case 'card': mask = cardMask; break;
+            case 'expiry': mask = expiryMask; break;
+            case 'cvv': mask = cvvMask; break;
+            default: mask = [];
+        }
+        const keyboardType: KeyboardTypeOptions = 'numeric';
+
+        return (
+            <View className="bytebank-input">
+                <Text style={styles.inputLabel}>{label}</Text>
+                <MaskInput
+                    value={value}
+                    onChangeText={onChangeText}
+                    mask={mask}
+                    placeholder={placeholder}
+                    keyboardType={keyboardType}
+                    maxLength={props.maxLength}
+                    style={[maskInputStyle, props?.editable === false ? { backgroundColor: '#e0e0e0', opacity: 0.3 } : {}]}
+                    {...props}
+                />
+                <HelperText />
+            </View>
+        );
+    }
+
+    return (
+        <View className="bytebank-input">
+            <Text style={styles.inputLabel}>{label}</Text>
+            <TextInput
+                {...props}
+                value={value}
+                onChangeText={onChangeText}
+                placeholder={placeholder}
+                keyboardType={props?.keyboardType}
+                mode="outlined"
+                theme={{ colors: { primary: theme.colors.primary, onSurfaceVariant: 'gray', onSurface: 'black' } }}
+                aria-describedby={helperId}
+                style={[styles.input, props?.editable === false ? { backgroundColor: '#eee', opacity: 0.5 } : {}]}
+                outlineStyle={styles.inputOutline}
+            />
+            <HelperText />
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    inputLabel: {
+        fontSize: 14,
+        color: '#333',
+        marginBottom: 5,
+        marginLeft: 10,
+        fontWeight: '500',
+    },
+    input: {
+        height: 50,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 10,
+        marginBottom: 20,
+    },
+    inputOutline: {
+        borderRadius: 10,
+        borderWidth: 0,
+    },
+});
