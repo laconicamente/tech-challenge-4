@@ -1,7 +1,6 @@
 import NoDataSvg from '@/assets/images/no-data.svg';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { TransactionItemProps } from '@/shared/classes/models/transaction';
-import { BalanceResume } from '@/shared/components/Balance/BalanceResume';
 import TransactionCreateDrawer from '@/shared/components/Transaction/TransactionCreateDrawer';
 import { TransactionFilterDrawer } from '@/shared/components/Transaction/TransactionFilterDrawer';
 import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
@@ -9,6 +8,7 @@ import { TransactionItem } from '@/shared/components/Transaction/TransactionItem
 import { TransactionSkeleton } from '@/shared/components/Transaction/TransactionSkeleton';
 import { useFinancial } from '@/shared/contexts/financial/FinancialContext';
 import { BytebankButton } from '@/shared/ui/Button';
+import { BalanceResume } from '@/src/modules/Balance';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useFocusEffect } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
