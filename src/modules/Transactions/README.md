@@ -7,15 +7,15 @@ Este módulo implementa a funcionalidade de **Transações e Balance** (Saldo) c
 ```
 src/modules/Transactions/
 ├── domain/                               # 🎯 Camada de Domínio
-│   └── interfaces/
-│       └── ITransactionRepository.ts     # Interface do repositório de transações
+│   ├── interfaces/
+│   │   └── ITransactionRepository.ts     # Interface do repositório de transações
+│   └── use-cases/
+│       └── CalculateBalanceUseCase.ts    # Caso de uso para calcular saldo
 ├── infrastructure/                       # 🔧 Camada de Infraestrutura
 │   ├── repositories/
 │   │   └── TransactionRepository.ts      # Implementação Firebase
 │   └── factories/
 │       └── transactionFactories.ts       # Factories para instâncias
-├── usecases/                            # 💼 Camada de Casos de Uso
-│   └── CalculateBalanceUseCase.ts        # Lógica de cálculo de saldo
 ├── presentation/                        # 🎨 Camada de Apresentação
 │   ├── hooks/
 │   │   └── useBalanceValue.ts           # Hook para gerenciar saldo
@@ -28,7 +28,7 @@ src/modules/Transactions/
 
 ```
 UI Component → Hook → UseCase → Repository → Firebase
-     ↑        (Presentation) (Business)  (Infrastructure) ↓
+     ↑        (Presentation) (Domain)  (Infrastructure) ↓
   State UI ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← Response
 ```
 
