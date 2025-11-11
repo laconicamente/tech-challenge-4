@@ -37,7 +37,6 @@ export class TransactionRepository implements ITransactionRepository {
       snap.docs.forEach((doc) => {
         const data = doc.data();
         
-        // Validação básica dos dados
         if (!data.type || !data.value || data.userId !== userId.trim()) {
           return;
         }

@@ -114,7 +114,6 @@ export function useTransactions(
       if (start) constraints.push(where("createdAt", ">=", start));
       if (endWithTime) constraints.push(where("createdAt", "<=", endWithTime));
 
-      // Valor mínimo e máximo
       let min = typeof minValue === "number" ? minValue : undefined;
       let max = typeof maxValue === "number" ? maxValue : undefined;
       if (typeof min === "number" && typeof max === "number" && min > max) {

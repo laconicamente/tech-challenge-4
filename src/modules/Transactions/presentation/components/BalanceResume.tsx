@@ -14,7 +14,6 @@ interface BalanceResumeProps {
 export const BalanceResume: React.FC<BalanceResumeProps> = ({
   showMinified = false
 }) => {
-  // Usar o valor do contexto financeiro para garantir sincronização
   const { balanceValue, isLoadingBalance } = useFinancial();
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
 
