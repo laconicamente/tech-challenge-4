@@ -1,6 +1,6 @@
 import { useAuth } from "@/shared/contexts/auth/AuthContext";
 import { useCallback, useEffect, useState } from "react";
-import { calculateTotalBalanceUseCase } from "../../infrastructure/factories/BalanceFactory";
+import { calculateBalanceUseCase } from "../../infrastructure/factories/transactionFactories";
 
 export function useBalanceValue() {
   const { user } = useAuth();
@@ -20,7 +20,7 @@ export function useBalanceValue() {
     setErrorTotal(null);
 
     try {
-      const totalValue = await calculateTotalBalanceUseCase.execute(user.uid);
+      const totalValue = await calculateBalanceUseCase.execute({ userId: user.uid });
       setTotal(totalValue);
     } catch (e: any) {
       const errorMessage = e.message ?? 
