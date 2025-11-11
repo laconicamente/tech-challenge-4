@@ -1,6 +1,6 @@
+import { useBalanceValue } from "@/modules/Transactions";
 import { TransactionFilter, TransactionItemProps } from "@/shared/classes/models/transaction";
 import { TransactionsResponse, useTransactions } from "@/shared/hooks/useTransactions";
-import { useBalanceValue } from "@/src/modules/Transactions";
 import { User } from "firebase/auth";
 import React, { createContext, useContext, useState } from "react";
 
