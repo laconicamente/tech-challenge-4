@@ -42,7 +42,7 @@ export const PaperLightTheme = {
     primary: Colors.light.primary,
     accent: Colors.light.accent,
     background: Colors.light["white.main"],
-    surface: Colors.light["white.main"], // <-- fundo claro para inputs
+    surface: Colors.light["white.main"],
     text: Colors.light.text,
     error: Colors.light.error,
     disabled: Colors.light.disabled,

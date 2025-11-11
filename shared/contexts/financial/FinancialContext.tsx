@@ -1,5 +1,5 @@
+import { useBalanceValue } from "@/modules/Transactions";
 import { TransactionFilter, TransactionItemProps } from "@/shared/classes/models/transaction";
-import { useBalanceValue } from "@/shared/hooks/useBalanceValue";
 import { TransactionsResponse, useTransactions } from "@/shared/hooks/useTransactions";
 import { User } from "firebase/auth";
 import React, { createContext, useContext, useState } from "react";
@@ -52,7 +52,7 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         loadMore,
         hasMore
     } = useTransactions({}, 5);
-    const { total: balanceValue, isLoadingBalance, refetchBalanceValue } = useBalanceValue({});
+    const { total: balanceValue, isLoadingBalance, refetchBalanceValue } = useBalanceValue();
     const [isBalanceVisible, setBalanceVisible] = useState(false);
 
     const fetchTransactions = (user: User, params?: TransactionFilter) => {

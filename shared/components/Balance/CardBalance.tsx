@@ -1,7 +1,7 @@
-import { BytebankCard } from "../../ui/Card";
+import { BalanceResume } from "@/modules/Transactions";
 import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { LinearGradient } from "expo-linear-gradient";
-import { BalanceResume } from "./BalanceResume";
+import { BytebankCard } from "../../ui/Card";
 
 export const CardBalance = () => {
     const palette = ColorsPalette.light;

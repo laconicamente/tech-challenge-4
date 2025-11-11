@@ -1,7 +1,7 @@
 import NoDataSvg from '@/assets/images/no-data.svg';
+import { BalanceResume } from '@/modules/Transactions';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { TransactionItemProps } from '@/shared/classes/models/transaction';
-import { BalanceResume } from '@/shared/components/Balance/BalanceResume';
 import TransactionCreateDrawer from '@/shared/components/Transaction/TransactionCreateDrawer';
 import { TransactionFilterDrawer } from '@/shared/components/Transaction/TransactionFilterDrawer';
 import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
