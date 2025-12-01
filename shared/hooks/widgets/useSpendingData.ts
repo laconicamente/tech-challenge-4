@@ -1,12 +1,12 @@
+import { useTransactionManager } from "@/modules/Transactions";
 import { CategoryWidgetItem } from "@/shared/classes/models/category";
 import { useAuth } from "@/shared/contexts/auth/AuthContext";
-import { useFinancial } from "@/shared/contexts/financial/FinancialContext";
 import { fetchSpendingByCategory } from "@/shared/services/widgetService";
 import { useEffect, useState } from "react";
 
 export const useWidgetSpendingByCategory = () => {
   const { user } = useAuth();
-  const { transactions } = useFinancial();
+  const { transactions } = useTransactionManager();
   const [widgetData, setWidgetData] = useState<CategoryWidgetItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

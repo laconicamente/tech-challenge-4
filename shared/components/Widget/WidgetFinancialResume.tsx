@@ -1,7 +1,7 @@
+import { useTransactionManager } from '@/modules/Transactions';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { TransactionType } from '@/shared/classes/models/transaction';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
-import { useFinancial } from '@/shared/contexts/financial/FinancialContext';
 import { formatCurrency } from '@/shared/helpers/formatCurrency';
 import { fetchFinancialResume } from '@/shared/services/widgetService';
 import { BytebankButton } from '@/shared/ui/Button';
@@ -58,7 +58,7 @@ const WidgetFinancialResume: React.FC = () => {
   const [data, setData] = useState<Point[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [activePoint, setActivePoint] = useState<Point | null>(null);
-  const { transactions } = useFinancial();
+  const { transactions } = useTransactionManager();
   const load = useCallback(async () => {
     if (!userId) return;
     setLoading(true);

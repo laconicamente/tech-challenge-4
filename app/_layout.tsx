@@ -1,6 +1,6 @@
+import { TransactionManagerProvider } from '@/modules/Transactions';
 import { PaperDarkTheme, PaperLightTheme } from '@/shared/classes/constants/Colors';
 import { AuthProvider } from '@/shared/contexts/auth/AuthContext';
-import { FinancialProvider } from '@/shared/contexts/financial/FinancialContext';
 import { useColorScheme } from '@/shared/hooks/useColorScheme';
 import '@/shared/i18n/datePickerLocale';
 import { useFonts } from 'expo-font';
@@ -26,24 +26,24 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (ready) {
-      SplashScreen.hideAsync().catch(()=>{});
+      SplashScreen.hideAsync().catch(() => { });
     }
   }, [ready]);
 
   if (!ready) return null;
-  
+
   return (
     <AuthProvider>
-      <FinancialProvider>
-      <PaperProvider theme={colorScheme === 'dark' ? PaperDarkTheme : PaperLightTheme}>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)/account-access" options={{ headerShown: false }} />
-          <Stack.Screen name="(protected)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </PaperProvider>
-      </FinancialProvider>
+      <TransactionManagerProvider>
+        <PaperProvider theme={colorScheme === 'dark' ? PaperDarkTheme : PaperLightTheme}>
+          <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)/account-access" options={{ headerShown: false }} />
+            <Stack.Screen name="(protected)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </PaperProvider>
+      </TransactionManagerProvider>
     </AuthProvider>
   );
 }

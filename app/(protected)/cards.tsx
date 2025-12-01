@@ -4,7 +4,7 @@ import { BankCardProps } from "@/shared/classes/models/bank-card";
 import { BankCardCreateDrawer } from "@/shared/components/BankCard/BankCardCreateDrawer";
 import BankCardDetails from "@/shared/components/BankCard/BankCardDetails";
 import BankCardItem from "@/shared/components/BankCard/BankCardItem";
-import TransactionHeader from "@/shared/components/Transaction/TransactionHeader";
+import ProtectedHeader from "@/shared/components/Header/ProtectedHeader";
 import { useBankCards } from "@/shared/hooks/useBankCards";
 import { SkeletonCard } from "@/shared/ui/Skeleton/SkeletonCard";
 import { Stack } from "expo-router";
@@ -97,7 +97,7 @@ const CardsScreen = () => {
       <Stack.Screen
         options={{
           header: () => (
-            <TransactionHeader
+            <ProtectedHeader
               title="Meus cartões"
               hasAction={true}
               iconAction={'plus-circle'}

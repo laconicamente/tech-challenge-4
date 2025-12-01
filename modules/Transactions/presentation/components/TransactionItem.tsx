@@ -1,9 +1,9 @@
+import { Transaction } from "@/modules/Transactions";
 import { formatCurrency } from "@/shared/helpers/formatCurrency";
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
-import { TransactionItemProps } from "../../classes/models/transaction";
 
-export const TransactionItem = ({transaction}: {transaction: TransactionItemProps}) => (
+export const TransactionItem = ({transaction}: {transaction: Transaction}) => (
     <View style={styles.itemContainer}>
         <View style={{ backgroundColor: transaction.type === 'income' ? '#eef4ce' : '#ffe7e7', ...styles.itemIconContainer }}>
             <Ionicons

@@ -13,7 +13,7 @@ interface TransactionHeaderProps {
   onActionPress?: () => void;
 }
 
-const TransactionHeader = ({ title = '', hasAction = false, iconAction = '', onActionPress }: TransactionHeaderProps) => {
+const ProtectedHeader = ({ title = '', hasAction = false, iconAction = '', onActionPress }: TransactionHeaderProps) => {
   const { user } = useAuth();
 
   return (
@@ -21,7 +21,7 @@ const TransactionHeader = ({ title = '', hasAction = false, iconAction = '', onA
       <View style={styles.headerContent}>
         <TouchableOpacity style={styles.leftIcon}>
           <View style={styles.avatarCircle}>
-            {user && user.photoURL ? <Image source={{ uri: user.photoURL }} cachePolicy="memory-disk" cachePolicy="memory-disk"
+            {user && user.photoURL ? <Image source={{ uri: user.photoURL }} cachePolicy="disk"
               contentFit="cover"
               transition={150} style={{ width: 50, height: 50, borderRadius: 25 }} /> : <MaterialIcons name="user" size={25} color={ColorsPalette.light['lime.800']} />}
           </View>
@@ -88,4 +88,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TransactionHeader;
+export default ProtectedHeader;

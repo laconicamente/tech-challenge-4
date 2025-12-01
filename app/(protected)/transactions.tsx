@@ -1,13 +1,7 @@
 import NoDataSvg from '@/assets/images/no-data.svg';
-import { BalanceResume } from '@/modules/Transactions';
+import { BalanceResume, Transaction, TransactionCreateDrawer, TransactionFilterDrawer, TransactionItem, TransactionSkeleton, useTransactionManager } from '@/modules/Transactions';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { TransactionItemProps } from '@/shared/classes/models/transaction';
-import TransactionCreateDrawer from '@/shared/components/Transaction/TransactionCreateDrawer';
-import { TransactionFilterDrawer } from '@/shared/components/Transaction/TransactionFilterDrawer';
-import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
-import { TransactionItem } from '@/shared/components/Transaction/TransactionItem';
-import { TransactionSkeleton } from '@/shared/components/Transaction/TransactionSkeleton';
-import { useFinancial } from '@/shared/contexts/financial/FinancialContext';
+import ProtectedHeader from '@/shared/components/Header/ProtectedHeader';
 import { BytebankButton } from '@/shared/ui/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useFocusEffect } from 'expo-router';
@@ -30,10 +24,10 @@ const CONTENT_RADIUS = 20;
 export default function TransactionsScreen() {
   const scrollY = useSharedValue(0);
 
-  const { transactions, isLoading, isLoadingMore, loadMore, setFilters, deleteTransaction, hasMore, refetch } = useFinancial();
+  const { transactions, isLoading, isLoadingMore, loadMore, setFilters, deleteTransaction, hasMore, refetch } = useTransactionManager();
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
-  const [transaction, setTransaction] = useState<TransactionItemProps | null>(null);
+  const [transaction, setTransaction] = useState<Transaction | null>(null);
   const openSwipeableRef = useRef<Swipeable | null>(null);
 
 
@@ -78,7 +72,7 @@ export default function TransactionsScreen() {
     loadMore?.();
   };
 
-  const handleEdit = (t: TransactionItemProps) => {
+  const handleEdit = (t: Transaction) => {
     setTransaction(t);
     setIsEditVisible(true);
   };
@@ -87,7 +81,7 @@ export default function TransactionsScreen() {
     <TransactionCreateDrawer visible={isEditVisible} transaction={transaction} onDismiss={() => { setIsEditVisible(false); closeCurrentSwipe(); }} />
   );
 
-  const handleDelete = (t: TransactionItemProps) => {
+  const handleDelete = (t: Transaction) => {
     Alert.alert('Excluir transação', 'Você tem certeza que deseja excluir esta transação?', [
       { text: 'Cancelar' },
       {
@@ -98,7 +92,7 @@ export default function TransactionsScreen() {
     ]);
   };
 
-  const renderRightActions = (item: TransactionItemProps) => (
+  const renderRightActions = (item: Transaction) => (
     <View style={{ flexDirection: 'row', height: '100%' }}>
       <TouchableRipple
         onPress={() => handleEdit(item)}
@@ -115,7 +109,7 @@ export default function TransactionsScreen() {
     </View>
   );
 
-  const renderItem = ({ item }: { item: TransactionItemProps }) => {
+  const renderItem = ({ item }: { item: Transaction }) => {
     let localRef: Swipeable | null = null;
     return (<Swipeable ref={(ref) => { localRef = ref; }}
       renderRightActions={() => renderRightActions(item)}
@@ -165,7 +159,7 @@ export default function TransactionsScreen() {
     <>
       <Stack.Screen
         options={{
-          header: () => <TransactionHeader />,
+          header: () => <ProtectedHeader />,
           headerShown: true,
         }}
       />

@@ -5,7 +5,7 @@ export class CalculateBalanceUseCase {
 
   async execute(filters: TransactionFilters): Promise<number> {
     try {
-      const transactions = await this.transactionRepository.getTransactionsByUser({
+      const { transactions } = await this.transactionRepository.getTransactionsByUser({
         userId: filters.userId
       });
 
@@ -22,7 +22,6 @@ export class CalculateBalanceUseCase {
       return totalBalance / 100 || 0;
       
     } catch (error) {
-      console.error('Error calculating total balance:', error);
       throw new Error(`Falha ao calcular saldo total: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   }

@@ -1,8 +1,10 @@
-import { CalculateBalanceUseCase } from '../../domain/use-cases/CalculateBalanceUseCase';
+import { AddTransactionUseCase, CalculateBalanceUseCase, DeleteTransactionUseCase, GetTransactionsUseCase, UpdateTransactionUseCase } from '../../domain/use-cases';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 
-// Instancia o TransactionRepository
 const transactionRepository = new TransactionRepository();
 
-// Injeta o TransactionRepository no UseCase
 export const calculateBalanceUseCase = new CalculateBalanceUseCase(transactionRepository);
+export const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);
+export const addTransactionUseCase = new AddTransactionUseCase(transactionRepository);
+export const updateTransactionUseCase = new UpdateTransactionUseCase(transactionRepository);
+export const deleteTransactionUseCase = new DeleteTransactionUseCase(transactionRepository);

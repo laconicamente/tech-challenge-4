@@ -1,6 +1,6 @@
+import { CardBalance } from '@/modules/Transactions/presentation';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { AppHeader } from '@/shared/components/AppHeader';
-import { CardBalance } from '@/shared/components/Balance/CardBalance';
+import { AppHeader } from '@/shared/components';
 import WidgetAnalysisMonthly from '@/shared/components/Widget/WidgetAnalysisMonthly';
 import WidgetBiggestEntries from '@/shared/components/Widget/WidgetBiggestEntries';
 import WidgetFinancialResume from '@/shared/components/Widget/WidgetFinancialResume';

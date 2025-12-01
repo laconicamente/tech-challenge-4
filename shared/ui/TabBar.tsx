@@ -1,3 +1,4 @@
+import { TransactionCreateDrawer } from '@/modules/Transactions';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { Feather } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -6,7 +7,6 @@ import { Href, useRouter, useSegments } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import TransactionCreateDrawer from '../components/Transaction/TransactionCreateDrawer';
 
 export const BytebankTabBar = () => {
     const router = useRouter();

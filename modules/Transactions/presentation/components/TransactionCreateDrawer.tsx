@@ -1,7 +1,17 @@
 import { datePickerTheme } from "@/shared/classes/constants/Colors";
 import { ColorsPalette } from "@/shared/classes/constants/Pallete";
+import { TransactionType } from "@/shared/classes/models/transaction";
 import { useAuth } from "@/shared/contexts/auth/AuthContext";
+import { parseCurrencyToNumber } from "@/shared/helpers/formatCurrency";
 import { formatDate, toDateFromFirestore } from "@/shared/helpers/formatDate";
+import { useCategories } from "@/shared/hooks/useCategories";
+import { useFeedbackAnimation } from "@/shared/hooks/useFeedbackAnimation";
+import { useMethods } from "@/shared/hooks/useMethods";
+import { BytebankButton } from "@/shared/ui/Button";
+import { FileUploadButton } from "@/shared/ui/FileUploadButton";
+import { BytebankInputController } from "@/shared/ui/Input/InputController";
+import { BytebankSelectController } from "@/shared/ui/Select/SelectController";
+import { BytebankTabSelector } from "@/shared/ui/TabSelector";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -19,27 +29,27 @@ import Modal from 'react-native-modal';
 import { Divider, PaperProvider, Portal } from "react-native-paper";
 import { DatePickerModal } from "react-native-paper-dates";
 import { CalendarDate } from "react-native-paper-dates/lib/typescript/Date/Calendar";
-import { TransactionItemProps, TransactionType } from "../../classes/models/transaction";
-import { useFinancial } from "../../contexts/financial/FinancialContext";
-import { parseCurrencyToNumber } from "../../helpers/formatCurrency";
-import { useCategories } from "../../hooks/useCategories";
-import { useFeedbackAnimation } from "../../hooks/useFeedbackAnimation";
-import { useMethods } from "../../hooks/useMethods";
-import { BytebankButton } from "../../ui/Button";
-import { FileUploadButton } from "../../ui/FileUploadButton";
-import { BytebankInputController } from "../../ui/Input/InputController";
-import { BytebankSelectController } from "../../ui/Select/SelectController";
-import { BytebankTabSelector } from "../../ui/TabSelector";
+import { Transaction } from "../../domain/interfaces/ITransactionRepository";
+import { useTransactionManager } from "../contexts/TransactionManagerContext";
 
 const height = Dimensions.get("window").height;
 
+interface TransactionFormData {
+    methodId: string;
+    categoryId: string;
+    createdAt: string | Date;
+    value: string | null;
+    type: TransactionType;
+    fileUrl: string;
+}
+
 interface TransactionCreateDrawerProps {
     visible: boolean;
-    transaction: TransactionItemProps | null;
+    transaction?: Transaction | null;
     onDismiss: () => void;
 }
 
-const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
+export const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
     visible,
     transaction = null,
     onDismiss,
@@ -48,12 +58,12 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
     const [title, setTitle] = useState<string>("");
     const [transactionType, setTransactionType] = useState<TransactionType>(transaction?.type || "income");
     const { user } = useAuth();
-    const { refetch, editTransaction, addTransaction, refetchBalanceValue } = useFinancial();
+    const { refetch, updateTransaction, addTransaction, refetchBalanceValue } = useTransactionManager();
     const { categories } = useCategories(transactionType);
     const { methods } = useMethods(transactionType);
     const [isLoading, setIsLoading] = useState(false);
 
-    const formMethods = useForm({
+    const formMethods = useForm<TransactionFormData>({
         mode: "onChange",
         defaultValues: {
             methodId: transaction?.methodId || "",
@@ -61,21 +71,22 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
             createdAt: transaction?.createdAt || "",
             value: transaction?.value ? String(Number(transaction.value)) : null,
             type: transactionType,
-            fileUrl: "",
+            fileUrl: transaction?.fileUrl || "",
         },
     });
-    const { setValue, reset, control, handleSubmit, formState, watch } = formMethods;
+    const { setValue, reset, control, handleSubmit, formState } = formMethods;
     const { isValid } = formState;
 
     useEffect(() => {
         if (transaction) {
             setTransactionType(transaction.type);
             setTitle("Editar transação");
+            const transactionDate = transaction.createdAt ? toDateFromFirestore(transaction.createdAt) : undefined;
             reset({
                 methodId: transaction.methodId || "",
                 categoryId: transaction.categoryId || "",
-                createdAt: transaction.createdAt ? toDateFromFirestore(transaction.createdAt) : "",
-                value: transaction.value ? String(Number(transaction.value)) : null,
+                createdAt: transactionDate || "",
+                value: transaction.value ? String(Number(transaction.value) / 100) : null,
                 type: transaction.type,
                 fileUrl: transaction.fileUrl || "",
             });
@@ -95,7 +106,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
         resetSettings(transactionType);
     }
 
-    const onSubmit = async (data: TransactionItemProps) => {
+    const onSubmit = async (data: TransactionFormData) => {
         if (!user) {
             Alert.alert("Ocorreu um erro", "Usuário não autenticado.");
             router.replace("/(auth)/account-access");
@@ -104,11 +115,12 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
 
         setIsLoading(true);
         try {
-        
             const isValueNaN = isNaN(parseFloat(String(data.value)));
-            const newTransaction = { ...data, value: !isValueNaN ? transaction?.value ?? data.value : parseCurrencyToNumber(data.value) * 100, userId: user.uid };
+            const formattedValue: string | number  = (!isValueNaN ? transaction?.value ?? data.value : parseCurrencyToNumber(data.value) * 100) || 0;
+            const createdAtDate = typeof data.createdAt === 'string' ? new Date(data.createdAt) : data.createdAt;
+            const newTransaction = { ...data, value: Number(formattedValue), userId: user.uid, createdAt: createdAtDate };
             if (transaction?.id) {
-                await editTransaction?.(transaction?.id, newTransaction);
+                await updateTransaction?.(transaction?.id, newTransaction);
             } else {
                 await addTransaction?.(newTransaction);
             }
@@ -171,7 +183,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                                     (<BytebankSelectController
                                         name={"methodId"}
                                         label="Tipo da transação"
-                                        items={methods.map(c => ({ label: c.name, value: c.id }))}
+                                        items={methods.map(c => ({ label: c.name, value: c.id || '' }))}
                                         placeholder="Selecione o tipo da transação"
                                         rules={{ required: "Tipo da transação é obrigatório" }}
                                     />
@@ -245,7 +257,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                                     <BytebankSelectController
                                         name="categoryId"
                                         label="Categoria"
-                                        items={categories.map(c => ({ label: c.name, value: c.id }))}
+                                        items={categories.map(c => ({ label: c.name, value: c.id || '' }))}
                                         placeholder="Selecione uma categoria"
                                         rules={{ required: "Categoria é obrigatória" }}
                                     />
@@ -331,5 +343,3 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
 });
-
-export default TransactionCreateDrawer;

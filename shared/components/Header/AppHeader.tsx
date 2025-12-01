@@ -6,7 +6,7 @@ import React from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "react-native-vector-icons/AntDesign";
-import { useAuth } from "../contexts/auth/AuthContext";
+import { useAuth } from "../../contexts/auth/AuthContext";
 
 export const AppHeader = ({ title = '' }: { title?: string }) => {
     const { logout, user } = useAuth();
@@ -38,7 +38,7 @@ export const AppHeader = ({ title = '' }: { title?: string }) => {
             }}>
                 <TouchableOpacity>
                     <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: ColorsPalette.light['lime.200'], borderRadius: 25, width: 50, height: 50 }}>
-                        {user && user.photoURL ? <Image source={{ uri: user.photoURL }} cachePolicy="memory-disk" cachePolicy="memory-disk"
+                        {user && user.photoURL ? <Image source={{ uri: user.photoURL }} cachePolicy="disk"
                             contentFit="cover"
                             transition={150} style={{ width: 50, height: 50, borderRadius: 25 }} /> : <MaterialIcons name="user" size={25} color={ColorsPalette.light['lime.800']} />}
                     </View>

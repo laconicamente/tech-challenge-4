@@ -1,11 +1,10 @@
-import { useFinancial } from "@/shared/contexts/financial/FinancialContext";
 import { formatCurrency } from "@/shared/helpers/formatCurrency";
 import { BytebankButton } from "@/shared/ui/Button";
 import { SkeletonText } from "@/shared/ui/Skeleton/SkeletonText";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from "react";
 import { Text, View } from "react-native";
+import { useTransactionManager } from "../contexts/TransactionManagerContext";
 
 interface BalanceResumeProps {
   showMinified?: boolean;
@@ -14,11 +13,10 @@ interface BalanceResumeProps {
 export const BalanceResume: React.FC<BalanceResumeProps> = ({
   showMinified = false
 }) => {
-  const { balanceValue, isLoadingBalance } = useFinancial();
-  const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const { balanceValue, isLoadingBalance, isBalanceVisible, setBalanceVisible } = useTransactionManager();
 
   const toggleBalanceVisibility = () => {
-    setIsBalanceVisible(!isBalanceVisible);
+    setBalanceVisible(!isBalanceVisible);
   };
 
   return (
