@@ -1,11 +1,11 @@
+import { useTransactionManager } from '@/modules/Transactions';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { useFinancial } from '@/shared/contexts/financial/FinancialContext';
 import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
 import React from 'react';
 import { Text, View } from 'react-native';
 
 const WidgetFinancialStatus = () => {
-    const { balanceValue, isLoading } = useFinancial();
+    const { balanceValue, isLoading } = useTransactionManager();
 
     const LoadingSkeleton = () => (
         <SkeletonText style={{ width: '100%', height: 80 }} />

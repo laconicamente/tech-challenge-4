@@ -1,11 +1,11 @@
+import { useTransactionManager } from "@/modules/Transactions";
 import { useAuth } from "@/shared/contexts/auth/AuthContext";
-import { useFinancial } from "@/shared/contexts/financial/FinancialContext";
 import { fetchAnalysisMonthly } from "@/shared/services/widgetService";
 import { useEffect, useState } from "react";
 
 export const useAnalysisMonthlyData = () => {
   const { user } = useAuth();
-  const { transactions } = useFinancial();
+  const { transactions } = useTransactionManager();
   const [widgetData, setWidgetData] = useState<{monthIncome: number; monthExpense: number; differenceValue: number; totalValue: number} | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
