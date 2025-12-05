@@ -1,5 +1,5 @@
 import { firestore } from "@/firebaseConfig";
-import { formatDate } from '@/shared/helpers/formatDate';
+import { formatDate } from "@/shared/helpers/formatDate";
 import {
   addDoc,
   collection,
@@ -14,23 +14,30 @@ import {
   startAfter,
   Timestamp,
   updateDoc,
-  where
+  where,
 } from "firebase/firestore";
-import { ITransactionRepository, PaginatedTransactions, Transaction, TransactionFilters } from "../../domain/interfaces/ITransactionRepository";
+import {
+  ITransactionRepository,
+  PaginatedTransactions,
+  Transaction,
+  TransactionFilters,
+} from "../../domain/interfaces/ITransactionRepository";
 
 export class TransactionRepository implements ITransactionRepository {
-  private readonly collectionName = 'transactions';
+  private readonly collectionName = "transactions";
 
   /**
    * Remove campos undefined de um objeto para evitar erros do Firestore
    */
-  private cleanTransactionFields(obj: Record<string, any>): Record<string, unknown> {
+  private cleanTransactionFields(
+    obj: Record<string, any>
+  ): Record<string, string> {
     return Object.entries(obj).reduce((acc, [key, value]) => {
       if (value !== undefined) {
         acc[key] = value;
       }
       return acc;
-    }, {} as Record<string, unknown>);
+    }, {} as Record<string, string>);
   }
 
   /**
@@ -38,7 +45,9 @@ export class TransactionRepository implements ITransactionRepository {
    */
   private async getCategoryName(categoryId: string): Promise<string | null> {
     try {
-      const categoryDoc = await getDoc(doc(firestore, 'categories', categoryId));
+      const categoryDoc = await getDoc(
+        doc(firestore, "categories", categoryId)
+      );
       if (categoryDoc.exists()) {
         return categoryDoc.data()?.name || null;
       }
@@ -53,7 +62,7 @@ export class TransactionRepository implements ITransactionRepository {
    */
   private async getMethodName(methodId: string): Promise<string | null> {
     try {
-      const methodDoc = await getDoc(doc(firestore, 'methods', methodId));
+      const methodDoc = await getDoc(doc(firestore, "methods", methodId));
       if (methodDoc.exists()) {
         return methodDoc.data()?.name || null;
       }
@@ -66,147 +75,154 @@ export class TransactionRepository implements ITransactionRepository {
   /**
    * Busca transações de um usuário com filtros e paginação
    */
-  async getTransactionsByUser(filters: TransactionFilters): Promise<PaginatedTransactions> {
-    const { 
-      userId, 
-      categoryId, 
-      methodId, 
-      startDate, 
-      endDate, 
-      minValue, 
+  async getTransactionsByUser(
+    filters: TransactionFilters
+  ): Promise<PaginatedTransactions> {
+    const {
+      userId,
+      categoryId,
+      methodId,
+      startDate,
+      endDate,
+      minValue,
       maxValue,
       pageSize = 10,
-      lastDocId
+      lastDocId,
     } = filters;
 
-    if (!userId || userId.trim() === '') {
-      throw new Error('O id do usuário é obrigatório para buscar transações');
+    const constraints: QueryFieldFilterConstraint[] = [
+      where("userId", "==", userId.trim()),
+    ];
+
+    if (categoryId) constraints.push(where("categoryId", "==", categoryId));
+    if (methodId) constraints.push(where("methodId", "==", methodId));
+
+    if (startDate) {
+      const start = new Date(startDate);
+      constraints.push(where("createdAt", ">=", start));
+    }
+    if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      constraints.push(where("createdAt", "<=", end));
     }
 
-    try {
-      const constraints: QueryFieldFilterConstraint[] = [
-        where("userId", "==", userId.trim())
-      ];
+    if (minValue !== undefined)
+      constraints.push(where("value", ">=", minValue));
+    if (maxValue !== undefined)
+      constraints.push(where("value", "<=", maxValue));
 
-      if (categoryId) constraints.push(where("categoryId", "==", categoryId));
-      if (methodId) constraints.push(where("methodId", "==", methodId));
+    const queryConstraints: any[] = [
+      ...constraints,
+      orderBy("createdAt", "desc"),
+    ];
 
-      if (startDate) {
-        const start = new Date(startDate);
-        constraints.push(where("createdAt", ">=", start));
-      }
-      if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        constraints.push(where("createdAt", "<=", end));
-      }
-
-      if (minValue !== undefined) constraints.push(where("value", ">=", minValue));
-      if (maxValue !== undefined) constraints.push(where("value", "<=", maxValue));
-
-      const queryConstraints: any[] = [
-        ...constraints,
-        orderBy("createdAt", "desc"),
-      ];
-
-      if (lastDocId) {
-        const lastDocRef = doc(firestore, this.collectionName, lastDocId);
-        const lastDocSnap = await getDocs(query(collection(firestore, this.collectionName), where("__name__", "==", lastDocId)));
-        if (!lastDocSnap.empty) {
-          queryConstraints.push(startAfter(lastDocSnap.docs[0]));
-        }
-      }
-
-      queryConstraints.push(limit(pageSize));
-
-      const qRef = query(collection(firestore, this.collectionName), ...queryConstraints);
-      const snap = await getDocs(qRef);
-
-      const transactions: Transaction[] = await Promise.all(
-        snap.docs.map(async (doc) => {
-          const data = doc.data();
-          const createdAtDate = data.createdAt?.toDate() || new Date();
-          
-          const [categoryName, methodName] = await Promise.all([
-            data.categoryId ? this.getCategoryName(data.categoryId) : Promise.resolve(null),
-            data.methodId ? this.getMethodName(data.methodId) : Promise.resolve(null)
-          ]);
-
-          return {
-            id: doc.id,
-            userId: data.userId,
-            type: data.type,
-            value: Number(data.value) || 0,
-            categoryId: data.categoryId,
-            methodId: data.methodId,
-            description: data.description,
-            createdAt: createdAtDate,
-            categoryName: categoryName,
-            methodName: methodName,
-            createdAtDisplay: formatDate(createdAtDate)
-          };
-        })
+    if (lastDocId) {
+      const lastDocRef = doc(firestore, this.collectionName, lastDocId);
+      const lastDocSnap = await getDocs(
+        query(
+          collection(firestore, this.collectionName),
+          where("__name__", "==", lastDocId)
+        )
       );
-
-      const hasMore = snap.docs.length === pageSize;
-      const newLastDocId = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1].id : undefined;
-
-      return {
-        transactions,
-        lastDocId: newLastDocId,
-        hasMore
-      };
-      
-    } catch (error) {
-      throw new Error(`Falha ao buscar transações: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      if (!lastDocSnap.empty) {
+        queryConstraints.push(startAfter(lastDocSnap.docs[0]));
+      }
     }
+
+    queryConstraints.push(limit(pageSize));
+
+    const qRef = query(
+      collection(firestore, this.collectionName),
+      ...queryConstraints
+    );
+    const snap = await getDocs(qRef);
+
+    const transactions: Transaction[] = await Promise.all(
+      snap.docs.map(async (doc) => {
+        const data = doc.data();
+        const createdAtDate = data.createdAt?.toDate() || new Date();
+
+        const [categoryName, methodName] = await Promise.all([
+          data.categoryId
+            ? this.getCategoryName(data.categoryId)
+            : Promise.resolve(null),
+          data.methodId
+            ? this.getMethodName(data.methodId)
+            : Promise.resolve(null),
+        ]);
+
+        return {
+          id: doc.id,
+          userId: data.userId,
+          type: data.type,
+          value: Number(data.value) || 0,
+          categoryId: data.categoryId,
+          methodId: data.methodId,
+          description: data.description,
+          createdAt: createdAtDate,
+          categoryName: categoryName,
+          methodName: methodName,
+          createdAtDisplay: formatDate(createdAtDate),
+        };
+      })
+    );
+
+    const hasMore = snap.docs.length === pageSize;
+    const newLastDocId =
+      snap.docs.length > 0 ? snap.docs[snap.docs.length - 1].id : undefined;
+
+    return {
+      transactions,
+      lastDocId: newLastDocId,
+      hasMore,
+    };
   }
 
   /**
    * Adiciona uma nova transação
    */
-  async addTransaction(transaction: Omit<Transaction, 'id'>): Promise<string> {
+  async addTransaction(transaction: Omit<Transaction, "id">): Promise<string> {
     try {
       const transactionData = this.cleanTransactionFields({
         ...transaction,
         createdAt: transaction.createdAt || Timestamp.now(),
       });
 
-      const docRef = await addDoc(collection(firestore, this.collectionName), transactionData);
-      
+      const docRef = await addDoc(
+        collection(firestore, this.collectionName),
+        transactionData
+      );
+
       return docRef.id;
-      
     } catch (error) {
-      throw new Error(`Falha ao adicionar transação: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      throw new Error(
+        `Falha ao adicionar transação: ${
+          error instanceof Error ? error.message : "Erro desconhecido"
+        }`
+      );
     }
   }
 
   /**
    * Atualiza uma transação existente
    */
-  async updateTransaction(id: string, transaction: Partial<Transaction>): Promise<void> {
-    try {
-      const docRef = doc(firestore, this.collectionName, id);
-      
-      const transactionData = this.cleanTransactionFields(transaction);
-      
-      await updateDoc(docRef, transactionData);
-      
-    } catch (error) {
-      throw new Error(`Falha ao atualizar transação: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
-    }
+  async updateTransaction(
+    id: string,
+    transaction: Partial<Transaction>
+  ): Promise<void> {
+    const docRef = doc(firestore, this.collectionName, id);
+
+    const transactionData = this.cleanTransactionFields(transaction);
+
+    await updateDoc(docRef, transactionData);
   }
 
   /**
    * Deleta uma transação
    */
   async deleteTransaction(id: string): Promise<void> {
-    try {
-      const docRef = doc(firestore, this.collectionName, id);
-      await deleteDoc(docRef);
-      
-    } catch (error) {
-      throw new Error(`Falha ao excluir transação: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
-    }
+    const docRef = doc(firestore, this.collectionName, id);
+    await deleteDoc(docRef);
   }
 }

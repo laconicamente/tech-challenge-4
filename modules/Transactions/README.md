@@ -7,8 +7,9 @@ Gerenciamento de transações financeiras e cálculo de saldo usando Clean Archi
 ```
 modules/Transactions/
 ├── domain/
+│   ├── entities/            # Regras de negócio e validações
 │   ├── interfaces/          # Contratos do repositório
-│   └── use-cases/           # Lógica de negócio
+│   └── use-cases/           # Orquestração de operações
 ├── infrastructure/
 │   ├── repositories/        # Implementação Firebase
 │   └── factories/           # Injeção de dependências
@@ -36,24 +37,38 @@ import { BalanceResume } from '@/modules/Transactions';
 
 ## Arquitetura
 
-**Domain**: Define as regras de negócio e interfaces, independente de frameworks.
+**Entities**: Encapsula regras de negócio e validações de dados da transação.
+
+**Use Cases**: Orquestra operações usando entities e repositórios.
 
 **Infrastructure**: Conecta com Firebase e fornece implementações concretas.
 
-**Use Cases**: Orquestra operações (ex: calcular saldo total).
-
 **Presentation**: Camada de UI com hooks e componentes React.
+
+## Entidade Transaction
+
+A entidade `TransactionEntity` centraliza as validações:
+
+- Valor deve ser maior que zero
+- UserId, categoryId e methodId são obrigatórios
+- Tipo deve ser 'income' ou 'expense'
+- Descrição limitada a 200 caracteres
+
+Métodos auxiliares: `isExpense()`, `isIncome()`, `toJSON()`
 
 ## Tipos
 
 ```typescript
-interface Transaction {
-  id: string;
+interface TransactionData {
+  id?: string;
   userId: string;
   type: 'income' | 'expense';
   value: number;
+  categoryId: string;
+  methodId: string;
   description?: string;
   createdAt?: Date;
+  fileUrl?: string;
 }
 ```
 

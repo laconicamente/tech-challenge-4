@@ -4,7 +4,6 @@ export class GetTransactionsUseCase {
   constructor(private transactionRepository: ITransactionRepository) {}
 
   async execute(filters: TransactionFilters): Promise<PaginatedTransactions> {
-    try {
       if (!filters.userId || filters.userId.trim() === '') {
         throw new Error('O id do usuário é obrigatório para buscar transações');
       }
@@ -18,9 +17,5 @@ export class GetTransactionsUseCase {
       const result = await this.transactionRepository.getTransactionsByUser(filters);
       
       return result;
-      
-    } catch (error) {
-      throw new Error(`Falha ao buscar transações: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
-    }
   }
 }
