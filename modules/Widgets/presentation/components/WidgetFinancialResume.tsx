@@ -3,13 +3,13 @@ import { TransactionType } from '@/modules/Transactions/domain/interfaces';
 import { useAuth } from '@/modules/Users';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { formatCurrency } from '@/shared/helpers/formatCurrency';
-import { fetchFinancialResume } from '@/shared/services/widgetService';
 import { BytebankButton } from '@/shared/ui/Button';
 import { FontAwesome } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
+import { fetchFinancialResumeUseCase } from '../../infrastructure/factories/widgetFactories';
 
 interface Point {
   timestamp: number;
@@ -47,7 +47,7 @@ const formatDay = (ts: number) => {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
 };
 
-const WidgetFinancialResume: React.FC = () => {
+export const WidgetFinancialResume: React.FC = () => {
   const { user } = useAuth();
   const userId = user?.uid;
   const [transactionType, setTransactionType] = React.useState<TransactionType>('income');
@@ -59,12 +59,13 @@ const WidgetFinancialResume: React.FC = () => {
   const [isLoading, setLoading] = useState(false);
   const [activePoint, setActivePoint] = useState<Point | null>(null);
   const { transactions } = useTransactionManager();
+  
   const load = useCallback(async () => {
     if (!userId) return;
     setLoading(true);
     try {
       const { start: s, end: e } = getDateRange(range);
-      const { totalValue, data: points } = await fetchFinancialResume(transactionType, userId, s, e);
+      const { totalValue, data: points } = await fetchFinancialResumeUseCase.execute(transactionType, userId, s, e);
       setData(points.sort((a, b) => a.timestamp - b.timestamp));
       setTotalValue(totalValue);
       setActivePoint(null);
@@ -96,8 +97,7 @@ const WidgetFinancialResume: React.FC = () => {
     Haptics.selectionAsync();
   };
 
-
-const handleTransactionTypeChange = () =>  setTransactionType((prev) => (prev === 'income' ? 'expense' : 'income'));
+  const handleTransactionTypeChange = () =>  setTransactionType((prev) => (prev === 'income' ? 'expense' : 'income'));
 
   return (
     <>
@@ -237,5 +237,3 @@ const styles = StyleSheet.create({
   tooltipValue: { color: '#d4e5d6', fontSize: 14, fontWeight: '600' },
   tooltipDate: { color: '#a3a58c', fontSize: 10, marginTop: 2 },
 });
-
-export default WidgetFinancialResume;

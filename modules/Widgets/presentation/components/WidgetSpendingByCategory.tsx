@@ -1,16 +1,16 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { WidgetCategoryItem } from '@/shared/classes/models/widget-category';
 import { formatCurrency } from '@/shared/helpers/formatCurrency';
-import { useWidgetSpendingByCategory } from '@/shared/hooks/widgets/useSpendingData';
 import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
 import React, { useEffect } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import SpendingCategoryItem from './SpendingCategoryItem';
+import { WidgetCategoryItem } from '../../domain/interfaces/IWidgetRepository';
+import { useWidgetSpendingByCategory } from '../hooks';
+import { SpendingCategoryItem } from './SpendingCategoryItem';
 
 const AnimatedCategoryItem = Animated.createAnimatedComponent(SpendingCategoryItem);
 
-const AnimatedCardItem = ({ item, delay }: { item: WidgetCategoryItem; delay: number }) => {
+ const AnimatedCardItem = ({ item, delay }: { item: WidgetCategoryItem; delay: number }) => {
     const sv = useSharedValue(0);
     useEffect(() => {
         sv.value = withTiming(1, { duration: 500, }, () => { });
@@ -26,7 +26,7 @@ const AnimatedCardItem = ({ item, delay }: { item: WidgetCategoryItem; delay: nu
     return <AnimatedCategoryItem data={item} style={style} />;
 };
 
-const WidgetSpendingByCategory = () => {
+export const WidgetSpendingByCategory = () => {
     const { widgetData, isLoading, error } = useWidgetSpendingByCategory();
 
     const totalSpending = () => formatCurrency(widgetData.reduce((acc, item) => acc + item.value, 0));
@@ -75,5 +75,3 @@ const WidgetSpendingByCategory = () => {
         </View>
     );
 };
-
-export default WidgetSpendingByCategory;

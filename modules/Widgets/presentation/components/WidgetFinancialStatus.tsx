@@ -4,7 +4,7 @@ import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
 import React from 'react';
 import { Text, View } from 'react-native';
 
-const WidgetFinancialStatus = () => {
+export const WidgetFinancialStatus = () => {
     const { balanceValue, isLoading } = useTransactionManager();
 
     const LoadingSkeleton = () => (
@@ -31,5 +31,3 @@ const WidgetFinancialStatus = () => {
         </View>
     );
 };
-
-export default WidgetFinancialStatus;

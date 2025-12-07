@@ -1,10 +1,10 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { formatCurrency } from '@/shared/helpers/formatCurrency';
-import { useAnalysisMonthlyData } from '@/shared/hooks/widgets/useAnalysisMonthlyData';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
 import { Card } from 'react-native-paper';
+import { useAnalysisMonthlyData } from '../hooks';
 
 const COLORS = {
   incomeMain: ColorsPalette.light['lime.400'],
@@ -12,7 +12,7 @@ const COLORS = {
   bgInnerCircle: ColorsPalette.light['lime.900'],
 };
 
-const WidgetAnalysisMonthly = () => {
+export const WidgetAnalysisMonthly = () => {
   const { widgetData } = useAnalysisMonthlyData();
   const chartData = useMemo(
     () => [
@@ -111,5 +111,3 @@ const styles = StyleSheet.create({
   legendValue: { fontSize: 15, fontWeight: '600', color: '#fff' },
   legendPercent: { fontSize: 11, color: '#888', marginTop: 2 }
 });
-
-export default WidgetAnalysisMonthly;

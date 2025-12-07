@@ -8,7 +8,7 @@ interface WidgetCategoryProps {
   color?: string;
 }
 
-const SpendingCategoryItem = ({ data, style = {}, ref }: { data: WidgetCategoryProps; style?: object; ref?: React.Ref<any> }) => {
+export const SpendingCategoryItem = ({ data, style = {}, ref }: { data: WidgetCategoryProps; style?: object; ref?: React.Ref<any> }) => {
   return (
     <View ref={ref} style={[styles.card, { backgroundColor: data.color }, style]}>
       <Text style={styles.value}>{formatCurrency(data.value)}</Text>
@@ -46,5 +46,3 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
-
-export default SpendingCategoryItem;

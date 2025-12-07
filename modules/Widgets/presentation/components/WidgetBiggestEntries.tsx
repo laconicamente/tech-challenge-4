@@ -1,13 +1,13 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { WidgetCategoryItem } from '@/shared/classes/models/widget-category';
 import { formatCurrency } from '@/shared/helpers/formatCurrency';
-import { useBiggestEntriesData } from '@/shared/hooks/widgets/useBiggestEntriesData';
 import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
 import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, View } from 'react-native';
+import { WidgetCategoryItem } from '../../domain/interfaces/IWidgetRepository';
+import { useBiggestEntriesData } from '../hooks';
 
-const WidgetBiggestEntries = () => {
+export const WidgetBiggestEntries = () => {
     const { widgetData, isLoading } = useBiggestEntriesData();
 
     const LoadingSkeleton = () => (<>
@@ -41,5 +41,3 @@ const WidgetBiggestEntries = () => {
         </View>
     );
 };
-
-export default WidgetBiggestEntries;
