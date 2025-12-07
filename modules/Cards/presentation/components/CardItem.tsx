@@ -1,12 +1,21 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import { maskCardNumber } from '@/shared/helpers/maskCardNumber';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { ColorValue, Dimensions, Image, StyleSheet, Text, View } from 'react-native';
-import { BankCardProps } from '../../classes/models/bank-card';
-import { maskCardNumber } from '../../helpers/maskCardNumber';
+import { Card } from '../../domain/interfaces/ICardRepository';
 
-const BankCardItem = ({ card }: { card: Partial<BankCardProps> }) => {
-  const { number, type = 'Platinum', color } = card as { number?: string; type?: keyof typeof cardColors; color?: string };
+interface CardItemProps {
+  card: Partial<Card>;
+}
+
+export const CardItem = ({ card }: CardItemProps) => {
+  const { number, type = 'Platinum', color } = card as { 
+    number?: string; 
+    type?: keyof typeof cardColors; 
+    color?: string;
+  };
+  
   const cardColors = {
     'Platinum': {
       backgroundColor: [ColorsPalette.light["lime.500"], ColorsPalette.light["lime.600"]],
@@ -20,16 +29,24 @@ const BankCardItem = ({ card }: { card: Partial<BankCardProps> }) => {
       backgroundColor: [ColorsPalette.light["lime.900"], ColorsPalette.light["grey.800"]],
       color: ColorsPalette.light["lime.50"]
     },
-  }
+    'Standard': {
+      backgroundColor: [ColorsPalette.light["lime.400"], ColorsPalette.light["lime.500"]],
+      color: ColorsPalette.light["lime.900"]
+    }
+  };
+
   return (
     <LinearGradient
-      colors={color ? [color as ColorValue, '#fff' as ColorValue] : (cardColors[type]?.backgroundColor || cardColors['Platinum'].backgroundColor) as [ColorValue, ColorValue]}
+      colors={color 
+        ? [color as ColorValue, '#fff' as ColorValue] 
+        : (cardColors[type]?.backgroundColor || cardColors['Platinum'].backgroundColor) as [ColorValue, ColorValue]
+      }
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.cardContainer}
     >
       <Image
-        source={require('../../../assets/images/pixels.png')}
+        source={require('@/assets/images/pixels.png')}
         style={styles.cardBackgroundImage}
         resizeMode="contain"
       />
@@ -37,7 +54,9 @@ const BankCardItem = ({ card }: { card: Partial<BankCardProps> }) => {
         <Text style={[styles.cardTitle, { color: cardColors[type]?.color }]}>Byte</Text>
         <Text style={[styles.cardType, { color: cardColors[type]?.color }]}>{type}</Text>
       </View>
-      <Text style={[styles.cardNumber, { color: cardColors[type]?.color }]}>{maskCardNumber(number ?? '')}</Text>
+      <Text style={[styles.cardNumber, { color: cardColors[type]?.color }]}>
+        {maskCardNumber(number ?? '')}
+      </Text>
     </LinearGradient>
   );
 };
@@ -80,5 +99,3 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
-
-export default BankCardItem;

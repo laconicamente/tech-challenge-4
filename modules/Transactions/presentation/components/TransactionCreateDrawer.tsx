@@ -1,7 +1,6 @@
 import { useAuth } from '@/modules/Users';
 import { datePickerTheme } from "@/shared/classes/constants/Colors";
 import { ColorsPalette } from "@/shared/classes/constants/Pallete";
-import { TransactionType } from "@/shared/classes/models/transaction";
 import { parseCurrencyToNumber } from "@/shared/helpers/formatCurrency";
 import { formatDate, toDateFromFirestore } from "@/shared/helpers/formatDate";
 import { useCategories } from "@/shared/hooks/useCategories";
@@ -29,7 +28,7 @@ import Modal from 'react-native-modal';
 import { Divider, PaperProvider, Portal } from "react-native-paper";
 import { DatePickerModal } from "react-native-paper-dates";
 import { CalendarDate } from "react-native-paper-dates/lib/typescript/Date/Calendar";
-import { Transaction } from "../../domain/interfaces/ITransactionRepository";
+import { Transaction, TransactionType } from "../../domain/interfaces/ITransactionRepository";
 import { useTransactionManager } from "../contexts/TransactionManagerContext";
 
 const height = Dimensions.get("window").height;

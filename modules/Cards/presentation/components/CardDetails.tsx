@@ -1,27 +1,43 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import { maskCardNumber } from '@/shared/helpers/maskCardNumber';
 import { SkeletonAvatar } from '@/shared/ui/Skeleton/SkeletonAvatar';
 import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
 import { MaterialIcons } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { BankCardProps } from '../../classes/models/bank-card';
-import { maskCardNumber } from '../../helpers/maskCardNumber';
+import { Card } from '../../domain/interfaces/ICardRepository';
 
-const BankCardDetails = ({ isLoading, card, onActionPress, onDelete }: { isLoading: boolean, card: Partial<BankCardProps>, onDelete: (id: string) => void, onActionPress: (id: string, data: Partial<BankCardProps>) => void }) => {
+interface CardDetailsProps {
+    isLoading: boolean;
+    card: Partial<Card>;
+    onUpdate: (id: string, data: Partial<Card>) => void;
+    onDelete: (id: string) => void;
+}
+
+export const CardDetails = ({ 
+    isLoading, 
+    card, 
+    onUpdate, 
+    onDelete 
+}: CardDetailsProps) => {
     
     if (isLoading) {
         return (
             <View style={{...styles.container, minHeight: 280}}>
-                {[...Array(4)].map((_, index) => <SkeletonText key={index} style={{ width: '100%', height: 20, marginBottom: 20 }} />)}
+                {[...Array(4)].map((_, index) => (
+                    <SkeletonText key={index} style={{ width: '100%', height: 20, marginBottom: 20 }} />
+                ))}
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                {[...Array(3)].map((_, index) => <SkeletonAvatar key={index} style={{ width: 50, height: 50, marginBottom: 20 }} />)}
+                    {[...Array(3)].map((_, index) => (
+                        <SkeletonAvatar key={index} style={{ width: 50, height: 50, marginBottom: 20 }} />
+                    ))}
                 </View>
             </View>
         );
     }
     
-    if (!card) return null;
+    if (!card || !card.id) return null;
 
     const cardDetailsList = [
         { label: 'Apelido', value: card.name },
@@ -29,10 +45,21 @@ const BankCardDetails = ({ isLoading, card, onActionPress, onDelete }: { isLoadi
         { label: 'Validade', value: card.expiredAt },
         { label: 'CVV', value: card.cvv },
     ];
+
+    const handleToggleBlock = () => {
+        onUpdate(card.id!, { blocked: !card.blocked });
+    };
+
+    const handleTogglePrincipal = () => {
+        onUpdate(card.id!, { principal: !card.principal });
+    };
+
+    const handleDelete = () => {
+        onDelete(card.id!);
+    };
+
     return (
-        <ScrollView
-            keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView keyboardShouldPersistTaps="handled">
             <View style={styles.container}>
                 <View>
                     {cardDetailsList.map((detail, index) => (
@@ -44,21 +71,46 @@ const BankCardDetails = ({ isLoading, card, onActionPress, onDelete }: { isLoadi
                 </View>
                 <View style={styles.actionButtonsContainer}>
                     <View style={styles.actionButtonWrapper}>
-                    <TouchableOpacity style={styles.actionButton} onPress={() => onActionPress(card.id ?? '', { blocked: !card.blocked })}>
-                        <MaterialIcons name={card.blocked ? "lock-open" : "lock"} size={20} color={ColorsPalette.light['lime.100']} />
-                    </TouchableOpacity>
-                        <Text style={styles.actionButtonText}>{card.blocked ? 'Desbloquear cartão' : 'Bloquear cartão'}</Text>
+                        <TouchableOpacity 
+                            style={styles.actionButton} 
+                            onPress={handleToggleBlock}
+                        >
+                            <MaterialIcons 
+                                name={card.blocked ? "lock-open" : "lock"} 
+                                size={20} 
+                                color={ColorsPalette.light['lime.100']} 
+                            />
+                        </TouchableOpacity>
+                        <Text style={styles.actionButtonText}>
+                            {card.blocked ? 'Desbloquear cartão' : 'Bloquear cartão'}
+                        </Text>
                     </View>
                     <View style={styles.actionButtonWrapper}>
-                    <TouchableOpacity style={styles.actionButton} onPress={() => onActionPress(card.id ?? '', { principal: !card.principal })}>
-                    <MaterialIcons name={"credit-card"} size={20} color={ColorsPalette.light['lime.100']} />
-                    </TouchableOpacity>
-                        <Text style={styles.actionButtonText}>{card.principal ? 'Desmarcar como principal' : 'Marcar como principal'}</Text>
+                        <TouchableOpacity 
+                            style={styles.actionButton} 
+                            onPress={handleTogglePrincipal}
+                        >
+                            <MaterialIcons 
+                                name="credit-card" 
+                                size={20} 
+                                color={ColorsPalette.light['lime.100']} 
+                            />
+                        </TouchableOpacity>
+                        <Text style={styles.actionButtonText}>
+                            {card.principal ? 'Desmarcar como principal' : 'Marcar como principal'}
+                        </Text>
                     </View>
                     <View style={styles.actionButtonWrapper}>
-                    <TouchableOpacity style={styles.actionDeleteButton} onPress={() => onDelete(card.id)}>
-                    <MaterialCommunityIcons name="card-remove-outline" size={20} color={ColorsPalette.light['lime.800']} />
-                    </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={styles.actionDeleteButton} 
+                            onPress={handleDelete}
+                        >
+                            <MaterialCommunityIcons 
+                                name="card-remove-outline" 
+                                size={20} 
+                                color={ColorsPalette.light['lime.800']} 
+                            />
+                        </TouchableOpacity>
                         <Text style={styles.deleteButtonText}>Excluir cartão</Text>
                     </View>
                 </View>
@@ -127,5 +179,3 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
 });
-
-export default BankCardDetails;
