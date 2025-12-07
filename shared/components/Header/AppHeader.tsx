@@ -1,3 +1,4 @@
+import { useAuth } from '@/modules/Users';
 import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { Feather } from "@expo/vector-icons";
 import { Image } from 'expo-image';
@@ -6,7 +7,6 @@ import React from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "react-native-vector-icons/AntDesign";
-import { useAuth } from "../../contexts/auth/AuthContext";
 
 export const AppHeader = ({ title = '' }: { title?: string }) => {
     const { logout, user } = useAuth();

@@ -1,4 +1,5 @@
 import { firestore } from "@/firebaseConfig";
+import { useAuth } from '@/modules/Users';
 import {
   collection,
   deleteDoc,
@@ -14,7 +15,6 @@ import {
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { BankCardFlag, BankCardProps } from "../classes/models/bank-card";
-import { useAuth } from "../contexts/auth/AuthContext";
 import { formatDateISO, toDateFromFirestore } from "../helpers/formatDate";
 
 export const useBankCards = () => {

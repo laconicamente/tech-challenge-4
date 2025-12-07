@@ -1,5 +1,5 @@
+import { useAuth } from '@/modules/Users';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { BytebankButton } from '@/shared/ui/Button';
 import { BytebankInputController } from '@/shared/ui/Input/InputController';
 import { BytebankTabSelector } from '@/shared/ui/TabSelector';

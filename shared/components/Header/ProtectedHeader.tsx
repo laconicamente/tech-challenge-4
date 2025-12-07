@@ -1,5 +1,5 @@
+import { useAuth } from '@/modules/Users';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { Image } from 'expo-image';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';

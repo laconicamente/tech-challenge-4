@@ -1,5 +1,5 @@
 import { useTransactionManager } from "@/modules/Transactions";
-import { useAuth } from "@/shared/contexts/auth/AuthContext";
+import { useAuth } from '@/modules/Users';
 import { fetchAnalysisMonthly } from "@/shared/services/widgetService";
 import { useEffect, useState } from "react";
 

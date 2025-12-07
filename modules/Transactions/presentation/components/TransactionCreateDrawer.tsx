@@ -1,7 +1,7 @@
+import { useAuth } from '@/modules/Users';
 import { datePickerTheme } from "@/shared/classes/constants/Colors";
 import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { TransactionType } from "@/shared/classes/models/transaction";
-import { useAuth } from "@/shared/contexts/auth/AuthContext";
 import { parseCurrencyToNumber } from "@/shared/helpers/formatCurrency";
 import { formatDate, toDateFromFirestore } from "@/shared/helpers/formatDate";
 import { useCategories } from "@/shared/hooks/useCategories";

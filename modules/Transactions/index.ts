@@ -13,9 +13,6 @@ export {
     addTransactionUseCase, calculateBalanceUseCase, deleteTransactionUseCase, getTransactionsUseCase, updateTransactionUseCase
 } from './infrastructure/factories/transactionFactories';
 
-// Presentation - Hooks
-export { useBalanceValue } from './presentation/hooks/useBalanceValue';
-export { useTransactions } from './presentation/hooks/useTransactions';
 export type { TransactionsParams, TransactionsResponse } from './presentation/hooks/useTransactions';
 
 // Presentation 

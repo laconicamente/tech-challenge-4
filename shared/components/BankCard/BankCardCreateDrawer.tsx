@@ -1,6 +1,6 @@
 import { firestore } from '@/firebaseConfig';
+import { useAuth } from '@/modules/Users';
 import { BankCardFlag, BankCardProps } from '@/shared/classes/models/bank-card';
-import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { useFeedbackAnimation } from '@/shared/hooks/useFeedbackAnimation';
 import { BytebankDrawer } from '@/shared/ui/Drawer';
 import { BytebankInputController } from '@/shared/ui/Input/InputController';

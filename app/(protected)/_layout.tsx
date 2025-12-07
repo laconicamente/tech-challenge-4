@@ -1,4 +1,4 @@
-import { useAuth } from '@/shared/contexts/auth/AuthContext';
+import { useAuth } from '@/modules/Users';
 import { BytebankTabBar } from '@/shared/ui/TabBar';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';

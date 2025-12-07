@@ -1,11 +1,11 @@
-import { useAuth } from "@/shared/contexts/auth/AuthContext";
+import { useAuth } from "@/modules/Users";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PaginatedTransactions, Transaction, TransactionFilters } from "../../domain/interfaces/ITransactionRepository";
 import {
-    addTransactionUseCase,
-    deleteTransactionUseCase,
-    getTransactionsUseCase,
-    updateTransactionUseCase,
+  addTransactionUseCase,
+  deleteTransactionUseCase,
+  getTransactionsUseCase,
+  updateTransactionUseCase,
 } from "../../infrastructure/factories/transactionFactories";
 
 export interface TransactionsParams {

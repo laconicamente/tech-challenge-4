@@ -1,6 +1,6 @@
 import { useTransactionManager } from "@/modules/Transactions";
+import { useAuth } from '@/modules/Users';
 import { CategoryWidgetItem } from "@/shared/classes/models/category";
-import { useAuth } from "@/shared/contexts/auth/AuthContext";
 import { fetchSpendingByCategory } from "@/shared/services/widgetService";
 import { useEffect, useState } from "react";
 

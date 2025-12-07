@@ -1,7 +1,7 @@
 import { useTransactionManager } from '@/modules/Transactions';
+import { TransactionType } from '@/modules/Transactions/domain/interfaces';
+import { useAuth } from '@/modules/Users';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { TransactionType } from '@/shared/classes/models/transaction';
-import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { formatCurrency } from '@/shared/helpers/formatCurrency';
 import { fetchFinancialResume } from '@/shared/services/widgetService';
 import { BytebankButton } from '@/shared/ui/Button';
