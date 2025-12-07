@@ -1,0 +1,31 @@
+import { useTransactionManager } from "@/modules/Transactions";
+import { useAuth } from '@/modules/Users';
+import { useEffect, useState } from "react";
+import { fetchAnalysisMonthlyUseCase } from "../../infrastructure/factories/widgetFactories";
+
+export const useAnalysisMonthlyData = () => {
+  const { user } = useAuth();
+  const { transactions } = useTransactionManager();
+  const [widgetData, setWidgetData] = useState<{monthIncome: number; monthExpense: number; differenceValue: number; totalValue: number} | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const getAnalysisMonthly = async () => {
+    try {
+      setIsLoading(true);
+      const responseData = await fetchAnalysisMonthlyUseCase.execute(user?.uid || "");
+      setWidgetData(responseData);
+    } catch (e: unknown) {
+      console.error("Ocorreu um erro ao buscar as entradas e saídas mensais.", e);
+      setError((e as Error).message ?? "Erro desconhecido");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getAnalysisMonthly();
+  }, [transactions]);
+
+  return { widgetData, isLoading, error };
+};

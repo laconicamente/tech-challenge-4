@@ -1,11 +1,7 @@
 import NoCardSvg from "@/assets/images/no-cards.svg";
+import { Card, CardCreateDrawer, CardDetails, CardItem, useCards } from "@/modules/Cards";
 import { ColorsPalette } from "@/shared/classes/constants/Pallete";
-import { BankCardProps } from "@/shared/classes/models/bank-card";
-import { BankCardCreateDrawer } from "@/shared/components/BankCard/BankCardCreateDrawer";
-import BankCardDetails from "@/shared/components/BankCard/BankCardDetails";
-import BankCardItem from "@/shared/components/BankCard/BankCardItem";
 import ProtectedHeader from "@/shared/components/Header/ProtectedHeader";
-import { useBankCards } from "@/shared/hooks/useBankCards";
 import { SkeletonCard } from "@/shared/ui/Skeleton/SkeletonCard";
 import { Stack } from "expo-router";
 import React, { useCallback, useState } from "react";
@@ -25,25 +21,24 @@ const { width } = Dimensions.get("window");
 const CardsScreen = () => {
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [visible, setVisible] = useState(false);
-  const { bankCards, isLoading, updateBankCard, deleteBankCard, refetch } =
-    useBankCards();
+  const { cards, isLoading, updateCard, deleteCard, refetch } = useCards();
 
   const onViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: Array<ViewToken<BankCardProps>> }) => {
+    ({ viewableItems }: { viewableItems: Array<ViewToken<Card>> }) => {
       if (viewableItems.length > 0) {
         setActiveCardIndex(viewableItems[0].index ?? 0);
       }
     },
-    [bankCards]
+    [cards]
   );
 
   const viewabilityConfig = {
     itemVisiblePercentThreshold: 50,
   };
 
-  const renderCardItem = ({ item }: { item: BankCardProps }) => (
+  const renderCardItem = ({ item }: { item: Card }) => (
     <View style={styles.cardWrapper}>
-      <BankCardItem card={item} />
+      <CardItem card={item} />
     </View>
   );
 
@@ -78,16 +73,27 @@ const CardsScreen = () => {
     </View>
   );
 
-  const handleActionCard = (id: string, data: Partial<BankCardProps>) => {
-    updateBankCard(id, data);
+  const handleUpdateCard = async (id: string, data: Partial<Card>) => {
+    try {
+      await updateCard(id, data);
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível atualizar o cartão. Tente novamente.");
+    }
   };
+
   const handleDeleteCard = (id: string) => {
     Alert.alert("Excluir cartão", "Você tem certeza que deseja excluir este cartão?", [
       { text: "Cancelar" },
       {
         text: "Confirmar exclusão",
         style: "destructive",
-        onPress: () => deleteBankCard(id),
+        onPress: async () => {
+          try {
+            await deleteCard(id);
+          } catch (error) {
+            Alert.alert("Erro", "Não foi possível excluir o cartão. Tente novamente.");
+          }
+        },
       }
     ]);
   };
@@ -112,7 +118,7 @@ const CardsScreen = () => {
         edges={["left", "right", "bottom"]}
       >
         <FlatList
-          data={bankCards}
+          data={cards}
           renderItem={renderCardItem}
           keyExtractor={(item) => item.id ?? item.name}
           horizontal
@@ -127,7 +133,7 @@ const CardsScreen = () => {
         />
 
         <View style={styles.pagination}>
-          {bankCards.map((_, index) => (
+          {cards.map((_, index) => (
             <View
               key={index}
               style={[
@@ -137,13 +143,13 @@ const CardsScreen = () => {
             />
           ))}
         </View>
-        <BankCardDetails
+        <CardDetails
           isLoading={isLoading}
-          card={bankCards[activeCardIndex]}
-          onActionPress={handleActionCard}
+          card={cards[activeCardIndex] || {}}
+          onUpdate={handleUpdateCard}
           onDelete={handleDeleteCard}
         />
-        <BankCardCreateDrawer
+        <CardCreateDrawer
           visible={visible}
           onDismiss={(hasUpdated) => {
             setVisible(false);

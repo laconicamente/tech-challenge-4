@@ -1,4 +1,4 @@
-import { useAuth } from '@/shared/contexts/auth/AuthContext';
+import { useAuth } from '@/modules/Users';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';

@@ -1,5 +1,5 @@
+import { useAuth } from '@/modules/Users';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { maskPhone } from '@/shared/helpers/maskPhone';
 import { useFeedbackAnimation } from '@/shared/hooks/useFeedbackAnimation';
 import { useUploadFile } from '@/shared/hooks/useUploadFile';

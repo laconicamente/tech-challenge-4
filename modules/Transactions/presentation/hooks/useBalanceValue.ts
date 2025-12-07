@@ -1,4 +1,4 @@
-import { useAuth } from "@/shared/contexts/auth/AuthContext";
+import { useAuth } from "@/modules/Users";
 import { useCallback, useEffect, useState } from "react";
 import { calculateBalanceUseCase } from "../../infrastructure/factories/transactionFactories";
 

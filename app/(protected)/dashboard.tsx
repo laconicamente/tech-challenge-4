@@ -1,12 +1,14 @@
 import { CardBalance } from '@/modules/Transactions/presentation';
+import { useAuth } from '@/modules/Users';
+import {
+  WidgetAnalysisMonthly,
+  WidgetBiggestEntries,
+  WidgetFinancialResume,
+  WidgetFinancialStatus,
+  WidgetSpendingByCategory
+} from '@/modules/Widgets';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { AppHeader } from '@/shared/components';
-import WidgetAnalysisMonthly from '@/shared/components/Widget/WidgetAnalysisMonthly';
-import WidgetBiggestEntries from '@/shared/components/Widget/WidgetBiggestEntries';
-import WidgetFinancialResume from '@/shared/components/Widget/WidgetFinancialResume';
-import WidgetFinancialStatus from '@/shared/components/Widget/WidgetFinancialStatus';
-import WidgetSpendingByCategory from '@/shared/components/Widget/WidgetSpending/WidgetSpendingByCategory';
-import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { Stack, useFocusEffect } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';

@@ -1,6 +1,6 @@
 import { TransactionManagerProvider } from '@/modules/Transactions';
+import { AuthProvider } from '@/modules/Users';
 import { PaperDarkTheme, PaperLightTheme } from '@/shared/classes/constants/Colors';
-import { AuthProvider } from '@/shared/contexts/auth/AuthContext';
 import { useColorScheme } from '@/shared/hooks/useColorScheme';
 import '@/shared/i18n/datePickerLocale';
 import { useFonts } from 'expo-font';

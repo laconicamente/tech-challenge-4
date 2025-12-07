@@ -1,8 +1,8 @@
+import { useCategories } from '@/modules/Categories';
+import { usePaymentMethods } from '@/modules/PaymentMethods';
+import { TransactionFilters } from '@/modules/Transactions';
 import { datePickerTheme } from '@/shared/classes/constants/Colors';
-import { TransactionFilter } from '@/shared/classes/models/transaction';
 import { parseCurrencyToNumber } from '@/shared/helpers/formatCurrency';
-import { useCategories } from '@/shared/hooks/useCategories';
-import { useMethods } from '@/shared/hooks/useMethods';
 import { BytebankDrawer } from '@/shared/ui/Drawer';
 import { BytebankInputController } from '@/shared/ui/Input/InputController';
 import { BytebankSelectController } from '@/shared/ui/Select/SelectController';
@@ -17,7 +17,7 @@ import { CalendarDate } from 'react-native-paper-dates/lib/typescript/Date/Calen
 interface TransactionFilterDrawerProps {
     visible: boolean;
     onDismiss: () => void;
-    onApplyFilter: (filters: TransactionFilter) => void;
+    onApplyFilter: (filters: Partial<TransactionFilters>) => void;
 }
 
 export const TransactionFilterDrawer = ({
@@ -27,7 +27,7 @@ export const TransactionFilterDrawer = ({
 }: TransactionFilterDrawerProps) => {
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
     const { categories } = useCategories();
-    const { methods } = useMethods();
+    const { methods } = usePaymentMethods();
 
     const formMethods = useForm({
         mode: "onChange",
@@ -44,10 +44,10 @@ export const TransactionFilterDrawer = ({
 
     const formatDate = (d?: string) => d ? new Date(d).toLocaleDateString('pt-BR') : '';
     const onDateDismiss = () => setIsDatePickerVisible(false);
-    const onDateConfirm = ({ startDate, endDate }: { startDate: string, endDate: string }) => {
+    const onDateConfirm = ({ startDate, endDate }: { startDate?: Date | undefined, endDate?: Date | undefined }) => {
         setIsDatePickerVisible(false);
-        setValue('startDate', startDate, { shouldDirty: true });
-        setValue('endDate', endDate, { shouldDirty: true });
+        if (startDate) setValue('startDate', startDate.toISOString(), { shouldDirty: true });
+        if (endDate) setValue('endDate', endDate.toISOString(), { shouldDirty: true });
     };
 
     const handleClearFilters = () => {
@@ -64,8 +64,11 @@ export const TransactionFilterDrawer = ({
     };
 
     const handleApplyFilter = (data: { methodId: string; categoryId: string; startDate: string; endDate: string; minValue: string; maxValue: string; }) => {
-        const filterData: TransactionFilter = {
-            ...data,
+        const filterData: Partial<TransactionFilters> = {
+            methodId: data.methodId || undefined,
+            categoryId: data.categoryId || undefined,
+            startDate: data.startDate || undefined,
+            endDate: data.endDate || undefined,
             minValue: data.minValue ? parseCurrencyToNumber(data.minValue) * 100 : undefined,
             maxValue: data.maxValue ? parseCurrencyToNumber(data.maxValue) * 100 : undefined,
         };
