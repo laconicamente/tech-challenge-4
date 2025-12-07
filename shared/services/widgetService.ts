@@ -1,14 +1,14 @@
 import { firestore } from "@/firebaseConfig";
+import { getCategoryByIdUseCase } from "@/modules/Categories";
+import { Transaction } from "@/modules/Transactions";
 import {
   collection,
   getDocs,
   orderBy,
   query,
   where,
-} from "@firebase/firestore";
-import { CategoryWidgetItem } from "../classes/models/category";
-import { TransactionItemProps } from "../classes/models/transaction";
-import { getCategoryById } from "./categoryService";
+} from "firebase/firestore";
+import { WidgetCategoryItem } from "../classes/models/widget-category";
 
 const generateShades = (index: number, totalItems: number) => {
   if (totalItems <= 1) return "#7a60602f";
@@ -43,14 +43,14 @@ export const fetchSpendingByCategory = async (userId: string) => {
 
   const querySnapshot = await getDocs(q);
 
-  const spendingData: { [key: string]: CategoryWidgetItem } = {};
+  const spendingData: { [key: string]: WidgetCategoryItem } = {};
 
   await Promise.all(
     querySnapshot.docs.map(async (doc) => {
-      const data = doc.data() as TransactionItemProps;
+      const data = doc.data() as Transaction;
       const categoryId = data.categoryId;
       if (categoryId) {
-        const category = await getCategoryById(categoryId);
+        const category = await getCategoryByIdUseCase.execute(categoryId);
 
         const spendingValue =
           (spendingData[categoryId]?.value || 0) + Number(data.value) / 100;
@@ -87,14 +87,14 @@ export const fetchBiggestEntries = async (userId: string) => {
 
   const querySnapshot = await getDocs(q);
 
-  const entryData: { [key: string]: CategoryWidgetItem } = {};
+  const entryData: { [key: string]: WidgetCategoryItem } = {};
 
   await Promise.all(
     querySnapshot.docs.map(async (doc) => {
-      const data = doc.data() as TransactionItemProps;
+      const data = doc.data() as Transaction;
       const categoryId = data.categoryId;
       if (categoryId) {
-        const category = await getCategoryById(categoryId);
+        const category = await getCategoryByIdUseCase.execute(categoryId);
 
         const entryValue =
           (entryData[categoryId]?.value || 0) + Number(data.value) / 100;

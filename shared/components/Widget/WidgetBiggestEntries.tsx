@@ -1,5 +1,5 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { CategoryWidgetItem } from '@/shared/classes/models/category';
+import { WidgetCategoryItem } from '@/shared/classes/models/widget-category';
 import { formatCurrency } from '@/shared/helpers/formatCurrency';
 import { useBiggestEntriesData } from '@/shared/hooks/widgets/useBiggestEntriesData';
 import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
@@ -17,7 +17,7 @@ const WidgetBiggestEntries = () => {
     </>
     );
 
-    const EntryItem = (data: CategoryWidgetItem) => (
+    const EntryItem = (data: WidgetCategoryItem) => (
         <View key={data.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10, paddingVertical: 15, borderBottomColor: '#eee', borderBottomWidth: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 <View style={{ backgroundColor: ColorsPalette.light['lime.800'], padding: 10, borderRadius: 10 }}>

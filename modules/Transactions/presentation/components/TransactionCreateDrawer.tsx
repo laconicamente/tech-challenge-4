@@ -1,11 +1,11 @@
+import { useCategories } from '@/modules/Categories';
+import { usePaymentMethods } from "@/modules/PaymentMethods";
 import { useAuth } from '@/modules/Users';
 import { datePickerTheme } from "@/shared/classes/constants/Colors";
 import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { parseCurrencyToNumber } from "@/shared/helpers/formatCurrency";
 import { formatDate, toDateFromFirestore } from "@/shared/helpers/formatDate";
-import { useCategories } from "@/shared/hooks/useCategories";
 import { useFeedbackAnimation } from "@/shared/hooks/useFeedbackAnimation";
-import { useMethods } from "@/shared/hooks/useMethods";
 import { BytebankButton } from "@/shared/ui/Button";
 import { FileUploadButton } from "@/shared/ui/FileUploadButton";
 import { BytebankInputController } from "@/shared/ui/Input/InputController";
@@ -59,7 +59,7 @@ export const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = (
     const { user } = useAuth();
     const { refetch, updateTransaction, addTransaction, refetchBalanceValue } = useTransactionManager();
     const { categories } = useCategories(transactionType);
-    const { methods } = useMethods(transactionType);
+    const { methods } = usePaymentMethods();
     const [isLoading, setIsLoading] = useState(false);
 
     const formMethods = useForm<TransactionFormData>({

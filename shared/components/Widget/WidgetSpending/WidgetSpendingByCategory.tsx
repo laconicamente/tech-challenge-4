@@ -1,5 +1,5 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { CategoryWidgetItem } from '@/shared/classes/models/category';
+import { WidgetCategoryItem } from '@/shared/classes/models/widget-category';
 import { formatCurrency } from '@/shared/helpers/formatCurrency';
 import { useWidgetSpendingByCategory } from '@/shared/hooks/widgets/useSpendingData';
 import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
@@ -10,7 +10,7 @@ import SpendingCategoryItem from './SpendingCategoryItem';
 
 const AnimatedCategoryItem = Animated.createAnimatedComponent(SpendingCategoryItem);
 
-const AnimatedCardItem = ({ item, delay }: { item: CategoryWidgetItem; delay: number }) => {
+const AnimatedCardItem = ({ item, delay }: { item: WidgetCategoryItem; delay: number }) => {
     const sv = useSharedValue(0);
     useEffect(() => {
         sv.value = withTiming(1, { duration: 500, }, () => { });
