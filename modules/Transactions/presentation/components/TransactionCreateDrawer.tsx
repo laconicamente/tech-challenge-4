@@ -112,6 +112,7 @@ export const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = (
             return;
         }
 
+        const startTime = performance.now();
         setIsLoading(true);
         try {
             const isValueNaN = isNaN(parseFloat(String(data.value)));
@@ -123,6 +124,10 @@ export const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = (
             } else {
                 await addTransaction?.(newTransaction);
             }
+
+            const totalTime = performance.now() - startTime;
+            const operation = transaction?.id ? 'atualização' : 'criação';
+            console.log(`[Performance - Cenário 4] Tempo total de ${operation} de transação (incluindo UI): ${totalTime.toFixed(2)}ms (${(totalTime / 1000).toFixed(2)}s)`);
 
             showFeedback("success");
             onDismiss();

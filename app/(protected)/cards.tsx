@@ -22,6 +22,19 @@ const CardsScreen = () => {
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [visible, setVisible] = useState(false);
   const { cards, isLoading, updateCard, deleteCard, refetch } = useCards();
+  const cardsLoadStartRef = React.useRef<number | null>(null);
+
+  React.useEffect(() => {
+    if (!isLoading && cards.length > 0 && cardsLoadStartRef.current) {
+      const loadTime = performance.now() - cardsLoadStartRef.current;
+      console.log(`[Performance - Cenário 5] Tempo total de carregamento da tela de cartões: ${loadTime.toFixed(2)}ms (${(loadTime / 1000).toFixed(2)}s)`);
+      cardsLoadStartRef.current = null;
+    }
+  }, [isLoading, cards.length]);
+
+  React.useEffect(() => {
+    cardsLoadStartRef.current = performance.now();
+  }, []);
 
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: Array<ViewToken<Card>> }) => {

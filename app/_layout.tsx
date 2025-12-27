@@ -5,7 +5,7 @@ import { useColorScheme } from '@/shared/hooks/useColorScheme';
 import '@/shared/i18n/datePickerLocale';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PaperProvider } from 'react-native-paper';
 import 'react-native-reanimated';
 
@@ -13,6 +13,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const startTimeRef = useRef<number>(performance.now());
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -26,7 +27,10 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (ready) {
-      SplashScreen.hideAsync().catch(() => { });
+      SplashScreen.hideAsync().then(() => {
+        const loadTime = performance.now() - startTimeRef.current;
+        console.log(`[Performance] Tempo de carregamento da aplicação: ${loadTime.toFixed(2)}ms (${(loadTime / 1000).toFixed(2)}s)`);
+      }).catch(() => { });
     }
   }, [ready]);
 
@@ -34,7 +38,7 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <TransactionManagerProvider>
+      <TransactionManagerProvider useReactive={true}>
         <PaperProvider theme={colorScheme === 'dark' ? PaperDarkTheme : PaperLightTheme}>
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />

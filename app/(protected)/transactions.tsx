@@ -33,7 +33,11 @@ export default function TransactionsScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      refetch?.();
+      const startTime = performance.now();
+      refetch?.().then(() => {
+        const loadTime = performance.now() - startTime;
+        console.log(`[Performance - Cenário 3] Tempo total de carregamento da tela de transações: ${loadTime.toFixed(2)}ms (${(loadTime / 1000).toFixed(2)}s)`);
+      });
     }, [refetch])
   );
 
