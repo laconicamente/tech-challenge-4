@@ -1,4 +1,6 @@
 import { CardBalance } from '@/modules/Transactions/presentation';
+import { prefetchTransactions } from '@/modules/Transactions/presentation/hooks/useTransactions';
+import { prefetchCards } from '@/modules/Cards/presentation/hooks/useCards';
 import { useAuth } from '@/modules/Users';
 import {
   WidgetAnalysisMonthly,
@@ -18,12 +20,29 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function DashboardScreen() {
   const { user } = useAuth();
   const [userName, setUserName] = React.useState<string>('');
+  const dashboardLoadStartRef = React.useRef<number | null>(null);
 
   useFocusEffect(
     React.useCallback(() => {
+      dashboardLoadStartRef.current = performance.now();
       if (user) {
         setUserName(user.displayName?.split(' ')[0] ?? 'Usuário');
       }
+      
+      if (user?.uid) {
+        setTimeout(() => {
+          prefetchTransactions(user.uid).catch(() => {});
+          prefetchCards(user.uid).catch(() => {});
+        }, 500);
+      }
+      
+      setTimeout(() => {
+        if (dashboardLoadStartRef.current) {
+          const loadTime = performance.now() - dashboardLoadStartRef.current;
+          console.log(`[Performance - Cenário 2] Tempo de carregamento do Dashboard: ${loadTime.toFixed(2)}ms (${(loadTime / 1000).toFixed(2)}s)`);
+          dashboardLoadStartRef.current = null;
+        }
+      }, 100);
     }, [user])
   );
 

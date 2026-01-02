@@ -62,4 +62,15 @@ export interface ITransactionRepository {
    * @returns Promise void
    */
   deleteTransaction(id: string): Promise<void>;
+
+  /**
+   * Subscreve a mudanças em tempo real nas transações de um usuário
+   * @param filters - Filtros incluindo userId obrigatório
+   * @param callback - Função chamada sempre que houver mudanças
+   * @returns Função para cancelar a subscrição
+   */
+  subscribeTransactions(
+    filters: TransactionFilters,
+    callback: (transactions: Transaction[]) => void
+  ): () => void;
 }

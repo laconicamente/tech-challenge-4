@@ -19,6 +19,42 @@ import { Card, CardFilters, ICardRepository } from "../../domain/interfaces/ICar
 export class CardRepository implements ICardRepository {
   private readonly collectionName = "cards";
 
+  private static cache = new Map<string, {
+    data: Card[];
+    updatedAt: number;
+  }>();
+  
+  private static readonly CACHE_TTL_MS = 60 * 1000;
+
+  /**
+   * Gera chave de cache baseada nos filtros
+   */
+  private getCacheKey(filters: CardFilters): string {
+    return JSON.stringify({
+      userId: filters.userId,
+      type: filters.type,
+      blocked: filters.blocked,
+      principal: filters.principal,
+    });
+  }
+
+  /**
+   * Invalida cache relacionado a um usuário
+   */
+  private invalidateUserCache(userId: string): void {
+    const keysToDelete: string[] = [];
+    CardRepository.cache.forEach((_, key) => {
+      try {
+        const parsed = JSON.parse(key);
+        if (parsed.userId === userId) {
+          keysToDelete.push(key);
+        }
+      } catch {
+      }
+    });
+    keysToDelete.forEach(key => CardRepository.cache.delete(key));
+  }
+
   /**
    * Remove campos undefined de um objeto para evitar erros do Firestore
    */
@@ -35,6 +71,13 @@ export class CardRepository implements ICardRepository {
    * Busca cartões de um usuário com filtros
    */
   async getCardsByUser(filters: CardFilters): Promise<Card[]> {
+    const cacheKey = this.getCacheKey(filters);
+    const cached = CardRepository.cache.get(cacheKey);
+    
+    if (cached && Date.now() - cached.updatedAt < CardRepository.CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     const { userId, type, blocked, principal } = filters;
 
     const constraints: QueryFieldFilterConstraint[] = [
@@ -70,6 +113,11 @@ export class CardRepository implements ICardRepository {
         principal: data.principal || false,
         createdAt: createdAtDate,
       };
+    });
+
+    CardRepository.cache.set(cacheKey, {
+      data: cards,
+      updatedAt: Date.now(),
     });
 
     return cards;
@@ -119,6 +167,10 @@ export class CardRepository implements ICardRepository {
         cardData
       );
 
+      if (card.userId) {
+        this.invalidateUserCache(card.userId);
+      }
+
       return docRef.id;
     } catch (error) {
       throw new Error(
@@ -136,6 +188,13 @@ export class CardRepository implements ICardRepository {
     const docRef = doc(firestore, this.collectionName, id);
     const cardData = this.cleanCardFields(card);
     await updateDoc(docRef, cardData);
+
+    const docSnap = await getDoc(docRef);
+    const userId = docSnap.data()?.userId;
+
+    if (userId) {
+      this.invalidateUserCache(userId);
+    }
   }
 
   /**
@@ -143,7 +202,14 @@ export class CardRepository implements ICardRepository {
    */
   async deleteCard(id: string): Promise<void> {
     const docRef = doc(firestore, this.collectionName, id);
+    const docSnap = await getDoc(docRef);
+    const userId = docSnap.data()?.userId;
+    
     await deleteDoc(docRef);
+
+    if (userId) {
+      this.invalidateUserCache(userId);
+    }
   }
 
   /**
@@ -167,5 +233,7 @@ export class CardRepository implements ICardRepository {
     batch.update(selectedCardRef, { principal: true });
 
     await batch.commit();
+
+    this.invalidateUserCache(userId);
   }
 }

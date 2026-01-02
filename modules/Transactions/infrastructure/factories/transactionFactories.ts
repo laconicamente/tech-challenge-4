@@ -1,7 +1,7 @@
 import { AddTransactionUseCase, CalculateBalanceUseCase, DeleteTransactionUseCase, GetTransactionsUseCase, UpdateTransactionUseCase } from '../../domain/use-cases';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 
-const transactionRepository = new TransactionRepository();
+export const transactionRepository = new TransactionRepository();
 
 export const calculateBalanceUseCase = new CalculateBalanceUseCase(transactionRepository);
 export const getTransactionsUseCase = new GetTransactionsUseCase(transactionRepository);

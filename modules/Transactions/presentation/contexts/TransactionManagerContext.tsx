@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 import { TransactionFilters } from "../../domain/interfaces/ITransactionRepository";
 import { useBalanceValue } from "../hooks/useBalanceValue";
 import { TransactionsResponse, useTransactions } from "../hooks/useTransactions";
+import { useTransactionsReactive } from "../hooks/useTransactionsReactive";
 
 export interface TransactionManagerProps extends TransactionsResponse {
   balanceValue: number;
@@ -15,15 +16,29 @@ export interface TransactionProviderProps {
   children: React.ReactNode;
   initialFilters?: Partial<TransactionFilters>;
   pageSize?: number;
+  useReactive?: boolean;
 }
 const TransactionManager = createContext<TransactionManagerProps | undefined>(undefined);
 
 export const TransactionManagerProvider: React.FC<TransactionProviderProps> = ({ 
   children,
   initialFilters = {},
-  pageSize = 10
+  pageSize = 10,
+  useReactive = false
 }) => {
-  const transactionsData = useTransactions({ initialFilters, pageSize });
+  const reactiveData = useTransactionsReactive({ initialFilters, pageSize });
+  const traditionalData = useTransactions({ initialFilters, pageSize });
+  
+  const transactionsData = useReactive ? {
+    ...reactiveData,
+    addTransaction: traditionalData.addTransaction,
+    updateTransaction: traditionalData.updateTransaction,
+    deleteTransaction: traditionalData.deleteTransaction,
+    loadMore: traditionalData.loadMore,
+    isLoadingMore: traditionalData.isLoadingMore,
+    hasMore: traditionalData.hasMore,
+  } : traditionalData;
+  
   const { total: balanceValue, isLoadingBalance, refetchBalanceValue } = useBalanceValue();
   const [isBalanceVisible, setBalanceVisible] = useState(false);
 

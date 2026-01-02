@@ -8,6 +8,7 @@ import {
   getDoc,
   getDocs,
   limit,
+  onSnapshot,
   orderBy,
   query,
   QueryFieldFilterConstraint,
@@ -25,6 +26,47 @@ import {
 
 export class TransactionRepository implements ITransactionRepository {
   private readonly collectionName = "transactions";
+
+  private static cache = new Map<string, {
+    data: PaginatedTransactions;
+    updatedAt: number;
+  }>();
+  
+  private static readonly CACHE_TTL_MS = 60 * 1000;
+
+  /**
+   * Gera chave de cache baseada nos filtros
+   */
+  private getCacheKey(filters: TransactionFilters): string {
+    return JSON.stringify({
+      userId: filters.userId,
+      categoryId: filters.categoryId,
+      methodId: filters.methodId,
+      startDate: filters.startDate?.toISOString(),
+      endDate: filters.endDate?.toISOString(),
+      minValue: filters.minValue,
+      maxValue: filters.maxValue,
+      pageSize: filters.pageSize,
+      lastDocId: filters.lastDocId,
+    });
+  }
+
+  /**
+   * Invalida cache relacionado a um usuário
+   */
+  private invalidateUserCache(userId: string): void {
+    const keysToDelete: string[] = [];
+    TransactionRepository.cache.forEach((_, key) => {
+      try {
+        const parsed = JSON.parse(key);
+        if (parsed.userId === userId) {
+          keysToDelete.push(key);
+        }
+      } catch {
+      }
+    });
+    keysToDelete.forEach(key => TransactionRepository.cache.delete(key));
+  }
 
   /**
    * Remove campos undefined de um objeto para evitar erros do Firestore
@@ -78,6 +120,13 @@ export class TransactionRepository implements ITransactionRepository {
   async getTransactionsByUser(
     filters: TransactionFilters
   ): Promise<PaginatedTransactions> {
+    const cacheKey = this.getCacheKey(filters);
+    const cached = TransactionRepository.cache.get(cacheKey);
+    
+    if (cached && Date.now() - cached.updatedAt < TransactionRepository.CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     const {
       userId,
       categoryId,
@@ -172,11 +221,18 @@ export class TransactionRepository implements ITransactionRepository {
     const newLastDocId =
       snap.docs.length > 0 ? snap.docs[snap.docs.length - 1].id : undefined;
 
-    return {
+    const result: PaginatedTransactions = {
       transactions,
       lastDocId: newLastDocId,
       hasMore,
     };
+
+    TransactionRepository.cache.set(cacheKey, {
+      data: result,
+      updatedAt: Date.now(),
+    });
+
+    return result;
   }
 
   /**
@@ -193,6 +249,10 @@ export class TransactionRepository implements ITransactionRepository {
         collection(firestore, this.collectionName),
         transactionData
       );
+
+      if (transaction.userId) {
+        this.invalidateUserCache(transaction.userId);
+      }
 
       return docRef.id;
     } catch (error) {
@@ -216,6 +276,10 @@ export class TransactionRepository implements ITransactionRepository {
     const transactionData = this.cleanTransactionFields(transaction);
 
     await updateDoc(docRef, transactionData);
+
+    if (transaction.userId) {
+      this.invalidateUserCache(transaction.userId);
+    }
   }
 
   /**
@@ -223,6 +287,108 @@ export class TransactionRepository implements ITransactionRepository {
    */
   async deleteTransaction(id: string): Promise<void> {
     const docRef = doc(firestore, this.collectionName, id);
+    const docSnap = await getDoc(docRef);
+    const userId = docSnap.data()?.userId;
+    
     await deleteDoc(docRef);
+
+    if (userId) {
+      this.invalidateUserCache(userId);
+    }
+  }
+
+  /**
+   * Subscreve a mudanças em tempo real nas transações de um usuário
+   * @param filters - Filtros incluindo userId obrigatório
+   * @param callback - Função chamada sempre que houver mudanças
+   * @returns Função para cancelar a subscrição
+   */
+  subscribeTransactions(
+    filters: TransactionFilters,
+    callback: (transactions: Transaction[]) => void
+  ): () => void {
+    const {
+      userId,
+      categoryId,
+      methodId,
+      startDate,
+      endDate,
+      minValue,
+      maxValue,
+      pageSize = 10,
+    } = filters;
+
+    const constraints: QueryFieldFilterConstraint[] = [
+      where("userId", "==", userId.trim()),
+    ];
+
+    if (categoryId) constraints.push(where("categoryId", "==", categoryId));
+    if (methodId) constraints.push(where("methodId", "==", methodId));
+
+    if (startDate) {
+      const start = new Date(startDate);
+      constraints.push(where("createdAt", ">=", start));
+    }
+    if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      constraints.push(where("createdAt", "<=", end));
+    }
+
+    if (minValue !== undefined)
+      constraints.push(where("value", ">=", minValue));
+    if (maxValue !== undefined)
+      constraints.push(where("value", "<=", maxValue));
+
+    const queryConstraints: any[] = [
+      ...constraints,
+      orderBy("createdAt", "desc"),
+      limit(pageSize),
+    ];
+
+    const q = query(
+      collection(firestore, this.collectionName),
+      ...queryConstraints
+    );
+
+    return onSnapshot(
+      q,
+      async (snapshot) => {
+        const transactions: Transaction[] = await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const data = doc.data();
+            const createdAtDate = data.createdAt?.toDate() || new Date();
+
+            const [categoryName, methodName] = await Promise.all([
+              data.categoryId
+                ? this.getCategoryName(data.categoryId)
+                : Promise.resolve(null),
+              data.methodId
+                ? this.getMethodName(data.methodId)
+                : Promise.resolve(null),
+            ]);
+
+            return {
+              id: doc.id,
+              userId: data.userId,
+              type: data.type,
+              value: Number(data.value) || 0,
+              categoryId: data.categoryId,
+              methodId: data.methodId,
+              description: data.description,
+              createdAt: createdAtDate,
+              categoryName: categoryName,
+              methodName: methodName,
+              createdAtDisplay: formatDate(createdAtDate),
+            };
+          })
+        );
+
+        callback(transactions);
+      },
+      (error) => {
+        console.error("Erro no stream de transações:", error);
+      }
+    );
   }
 }

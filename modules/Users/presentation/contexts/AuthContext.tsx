@@ -40,8 +40,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
+    const startTime = performance.now();
     try {
       await loginUseCase.execute({ email, password });
+      const authTime = performance.now() - startTime;
+      console.log(`[Performance - Cenário 1] Tempo de autenticação Firebase Auth: ${authTime.toFixed(2)}ms (${(authTime / 1000).toFixed(2)}s)`);
       return true;
     } catch (error) {
       console.error('Erro de login:', error);

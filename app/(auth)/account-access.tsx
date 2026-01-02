@@ -53,8 +53,13 @@ const AccountAccessScreen = () => {
     }, [user, authLoading]);
 
     const handleLogin = async (data: {email: string; password: string}) => {
+        const startTime = performance.now();
         setIsLoading(true);
         const success = await login(data.email, data.password);
+        const loginTime = performance.now() - startTime;
+        
+        console.log(`[Performance - Cenário 1] Tempo de autenticação (login): ${loginTime.toFixed(2)}ms (${(loginTime / 1000).toFixed(2)}s)`);
+        
         setIsLoading(false);
 
         if (!success) {
