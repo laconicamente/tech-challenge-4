@@ -6,12 +6,22 @@ Bem-vindo ao projeto de estudo **Bytebank**, uma aplicação mobile moderna dese
 
 ## 🚀 Funcionalidades
 
-- Autenticação de usuário (login e cadastro)
-- Criação, edição e exclusão de transações financeiras
-- Filtro e visualização do extrato de transações
-- Visualização do saldo total
-- Edição de perfil do usuário
-- Visualização e exclusão de cartões vinculados à conta
+-   Autenticação de usuário (login e cadastro)
+-   Criação, edição e exclusão de transações financeiras
+-   Filtro e visualização do extrato de transações
+-   Visualização do saldo total
+-   Edição de perfil do usuário
+-   Visualização e exclusão de cartões vinculados à conta
+
+---
+
+## 📖 Documentação
+
+> **Importante**: As explicações específicas solicitadas no Tech Challenge – Fase 4 sobre arquitetura, performance e segurança estão documentadas separadamente nos seguintes documentos:
+
+-   **[Documentação de Arquitetura](./docs/architecture.md)** – Detalha a organização da arquitetura do projeto, módulos de funcionalidade, camadas (Domain, Infrastructure, Presentation) e estrutura geral do código.
+-   **[Documentação de Performance](./docs/performance-test-plan.md)** – Explica a melhoria de performance implementada no projeto, detalhando os testes realizados e as otimizações de renderização e cache de dados.
+-   **[Documentação de Segurança](./docs/security.md)** – Explica a implementação de autenticação segura e criptografia de dados sensíveis, incluindo proteção de rotas e validações de segurança.
 
 ---
 
@@ -48,15 +58,15 @@ npx expo start
 
 Você pode abrir o app em:
 
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go) no seu dispositivo físico
+-   [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+-   [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+-   [Expo Go](https://expo.dev/go) no seu dispositivo físico
 
 ---
 
 ## 🌐 Backend
 
-Foi utilizado os serviços do Firebase para integração de funcionalides, sendo eles: **Firestore Database** para salvarmos os dados no banco de dados do Firebase e também foi utilizado o **Firebase Storage** para armazenar os comprovantes de transações e imagens do usuário. 
+Foram utilizados os serviços do Firebase para integração de funcionalides, sendo eles: **Firestore Database** para salvar os dados no banco do Firebase e o **Firebase Storage** para armazenar os comprovantes de transações e imagens do usuário.
 
 Para configurar o Firebase no projeto foi necessário seguir os seguintes passos:
 
@@ -74,19 +84,19 @@ Para configurar o Firebase no projeto foi necessário seguir os seguintes passos
     import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 
     const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_AUTH_DOMAIN",
-      projectId: "SEU_PROJECT_ID",
-      storageBucket: "SEU_STORAGE_BUCKET",
-      messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-      appId: "SEU_APP_ID",
-      measurementId: "SEU_MEASUREMENT_ID",
+    	apiKey: "SUA_API_KEY",
+    	authDomain: "SEU_AUTH_DOMAIN",
+    	projectId: "SEU_PROJECT_ID",
+    	storageBucket: "SEU_STORAGE_BUCKET",
+    	messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+    	appId: "SEU_APP_ID",
+    	measurementId: "SEU_MEASUREMENT_ID"
     };
 
     const app = initializeApp(firebaseConfig);
 
     const auth = initializeAuth(app, {
-      persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+    	persistence: getReactNativePersistence(ReactNativeAsyncStorage)
     });
     const firestore = getFirestore(app);
     const storage = getStorage(app);
@@ -112,7 +122,7 @@ O layout do app foi baseado no protótipo Web do [Figma](https://www.figma.com/d
 
 ## 📚 Documentação e Links Úteis
 
-- [React Native](https://reactnative.dev/docs/getting-started)
-- [Expo](https://docs.expo.dev/)
-- [React Navigation](https://reactnavigation.org/docs/getting-started)
-- [React Native Paper](https://callstack.github.io/react-native-paper/)
+-   [React Native](https://reactnative.dev/docs/getting-started)
+-   [Expo](https://docs.expo.dev/)
+-   [React Navigation](https://reactnavigation.org/docs/getting-started)
+-   [React Native Paper](https://callstack.github.io/react-native-paper/)
