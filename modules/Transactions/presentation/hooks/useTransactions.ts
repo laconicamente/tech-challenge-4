@@ -38,6 +38,7 @@ export async function prefetchTransactions(
 export interface TransactionsParams {
   initialFilters?: Partial<TransactionFilters>;
   pageSize?: number;
+  onTransactionChange?: () => Promise<void>;
 }
 
 export interface TransactionsResponse {
@@ -58,7 +59,7 @@ export interface TransactionsResponse {
 export function useTransactions(
   params: TransactionsParams = {}
 ): TransactionsResponse {
-  const { initialFilters = {}, pageSize = 10 } = params;
+  const { initialFilters = {}, pageSize = 10, onTransactionChange } = params;
   const { user } = useAuth();
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -198,13 +199,14 @@ export function useTransactions(
       }
       
       await refetch();
+      await onTransactionChange?.();
     } catch (e) {
       console.error('Erro ao adicionar transação:', e);
       throw e;
     } finally {
       setIsLoading(false);
     }
-  }, [user?.uid, refetch, filters]);
+  }, [user?.uid, refetch, filters, onTransactionChange]);
 
   const updateTransaction = useCallback(async (id: string, transaction: Partial<Transaction>) => {
     if (!user?.uid) {
@@ -225,13 +227,14 @@ export function useTransactions(
       }
       
       await refetch();
+      await onTransactionChange?.();
     } catch (e) {
       console.error('Erro ao atualizar transação:', e);
       throw e;
     } finally {
       setIsLoading(false);
     }
-  }, [user?.uid, refetch, filters]);
+  }, [user?.uid, refetch, filters, onTransactionChange]);
 
   const deleteTransaction = useCallback(async (id: string) => {
     if (!user?.uid) {
@@ -256,6 +259,7 @@ export function useTransactions(
       }
       
       setTransactions(prev => prev.filter(t => t.id !== id));
+      await onTransactionChange?.();
     } catch (e) {
       console.error('Erro ao excluir transação:', e);
       const errorMessage = e instanceof Error ? e.message : 'Erro ao excluir transação';
@@ -264,7 +268,7 @@ export function useTransactions(
     } finally {
       setIsLoading(false);
     }
-  }, [user?.uid, filters]);
+  }, [user?.uid, filters, onTransactionChange]);
 
   useEffect(() => {
     fetchFirstPage();

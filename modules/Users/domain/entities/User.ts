@@ -22,10 +22,6 @@ export class UserEntity {
   }
 
   private validate(data: User): void {
-    if (!data.uid || data.uid.trim() === '') {
-      throw new Error('UID do usuário é obrigatório');
-    }
-
     if (data.email && !this.isValidEmail(data.email)) {
       throw new Error('Email inválido');
     }

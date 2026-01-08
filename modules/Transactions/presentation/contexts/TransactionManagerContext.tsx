@@ -18,6 +18,7 @@ export interface TransactionProviderProps {
   pageSize?: number;
   useReactive?: boolean;
 }
+
 const TransactionManager = createContext<TransactionManagerProps | undefined>(undefined);
 
 export const TransactionManagerProvider: React.FC<TransactionProviderProps> = ({ 
@@ -26,8 +27,16 @@ export const TransactionManagerProvider: React.FC<TransactionProviderProps> = ({
   pageSize = 10,
   useReactive = false
 }) => {
+  const { total: balanceValue, isLoadingBalance, refetchBalanceValue } = useBalanceValue();
+  const [isBalanceVisible, setBalanceVisible] = useState(false);
+
+  const traditionalData = useTransactions({ 
+    initialFilters, 
+    pageSize,
+    onTransactionChange: refetchBalanceValue 
+  });
+  
   const reactiveData = useTransactionsReactive({ initialFilters, pageSize });
-  const traditionalData = useTransactions({ initialFilters, pageSize });
   
   const transactionsData = useReactive ? {
     ...reactiveData,
@@ -38,9 +47,6 @@ export const TransactionManagerProvider: React.FC<TransactionProviderProps> = ({
     isLoadingMore: traditionalData.isLoadingMore,
     hasMore: traditionalData.hasMore,
   } : traditionalData;
-  
-  const { total: balanceValue, isLoadingBalance, refetchBalanceValue } = useBalanceValue();
-  const [isBalanceVisible, setBalanceVisible] = useState(false);
 
   return (
     <TransactionManager.Provider
