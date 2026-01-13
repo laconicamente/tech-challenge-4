@@ -36,8 +36,8 @@ Certifique-se de ter o [Node.js](https://nodejs.org/) e o [Expo CLI](https://doc
 Clone este repositório:
 
 ```bash
-git clone https://github.com/laconicamente/tech-challenge-3.git
-cd tech-challenge-3
+git clone https://github.com/laconicamente/tech-challenge-4.git
+cd tech-challenge-4
 ```
 
 Instale as dependências:
